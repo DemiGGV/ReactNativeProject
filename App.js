@@ -1,65 +1,39 @@
 import React from "react";
-import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 
-import {
-  ImageBackground,
-  StyleSheet,
-  Text,
-  View,
-  ActivityIndicator,
-} from "react-native";
-import { Home } from "./components/Home";
-
-const bckGround = require("./assets/imgs/BG.jpg");
+// import { Home } from "./src/components/Home";
+import { RegistrationScreen } from "./src/screens/RegistrationScreen";
+import { LoginScreen } from "./src/screens/LoginScreen";
 
 const App = () => {
   const [fontsLoaded] = useFonts({
-    "Inter-Black": require("./assets/fonts/Inter-Black.otf"),
+    "Roboto-Bold": require("./assets/fonts/Roboto-Bold.ttf"),
+    "Roboto-Regular": require("./assets/fonts/Roboto-Regular.ttf"),
+    "Roboto-Medium": require("./assets/fonts/Roboto-Medium.ttf"),
   });
   if (!fontsLoaded) {
     return null;
   }
-  return (
-    <View style={styles.container}>
-      <ImageBackground
-        source={bckGround}
-        resizeMode="cover"
-        style={styles.image}
-      >
-        <Home>
-          <Text style={styles.text}>
-            <ActivityIndicator size="large" color="#00ff00" />
-          </Text>
-        </Home>
-        <StatusBar style="auto" />
-      </ImageBackground>
-    </View>
-  );
+  return <RegistrationScreen />;
+  return <LoginScreen />;
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  image: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-  },
-  text: {
-    color: "white",
-    width: "100%",
-    fontFamily: "Roboto",
-    fontSize: 42,
-    lineHeight: 84,
-    fontWeight: "bold",
-    textAlign: "center",
-    backgroundColor: "#000000c0",
-  },
-});
-
 export default App;
+
+// Icons
+
+// import { Feather } from '@expo/vector-icons';
+
+//<Feather name="plus-circle" size={24} color="black" />
+//<Feather name="x-circle" size={24} color="black" />
+//<Feather name="arrow-left" size={24} color="black" />
+//<Feather name="trash" size={24} color="black" />
+//<Feather name="plus" size={24} color="black" />
+//<Feather name="camera" size={24} color="black" />
+//<Feather name="arrow-up-circle" size={24} color="black" />
+//<Feather name="thumbs-up" size={24} color="black" />
+//<Feather name="message-circle" size={24} color="black" />
+//<Feather name="user" size={24} color="black" />
+//<Feather name="map-pin" size={24} color="black" />
+//<Feather name="grid" size={24} color="black" />
+//<Feather name="log-out" size={24} color="black" />

@@ -4,7 +4,7 @@ import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
 import styled from "styled-components/native";
 
-import { BackgroundComponent } from "../components/BackgroudComponent";
+import { BackgroundComponent } from "../components/BackgroundComponent";
 const userAvatar = require("../imgs/user.jpg");
 
 export const RegistrationScreen = () => {

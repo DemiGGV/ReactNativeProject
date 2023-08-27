@@ -3,7 +3,7 @@ import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
 import { Formik } from "formik";
 import styled from "styled-components/native";
 
-import { BackgroundComponent } from "../components/BackgroudComponent";
+import { BackgroundComponent } from "../components/BackgroundComponent";
 
 export const LoginScreen = () => {
   const [keyboardStatus, setKeyboardStatus] = useState(false);

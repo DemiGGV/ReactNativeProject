@@ -32,76 +32,74 @@ export const LoginScreen = () => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <BackgroundComponent>
-        <ContainerViewMain
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <RegFormView style={keyboardStatus && [{ height: 260 }]}>
-            <TitleH1>Autorization</TitleH1>
-            <Formik
-              initialValues={{ email: "", password: "" }}
-              onSubmit={(values, { resetForm }) => {
-                console.log(values);
-                resetForm();
-              }}
-            >
-              {({ handleChange, handleBlur, handleSubmit, values }) => (
-                <FormWrapper>
-                  <FormField
-                    style={[focused === "email" && focusedFieldStyle]}
-                    onFocus={() => {
-                      setFocused("email");
-                    }}
-                    onChangeText={handleChange("email")}
-                    onBlur={() => {
-                      setFocused("");
-                      handleBlur("email");
-                    }}
-                    value={values.email}
-                    placeholder="E-mail"
-                    inputMode="email"
-                  />
-                  <View>
+      <View style={{ flex: 1 }}>
+        <BackgroundComponent>
+          <ContainerViewMain
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <RegFormView style={keyboardStatus && [{ height: 260 }]}>
+              <TitleH1>Autorization</TitleH1>
+              <Formik
+                initialValues={{ email: "", password: "" }}
+                onSubmit={(values, { resetForm }) => {
+                  console.log(values);
+                  resetForm();
+                }}
+              >
+                {({ handleChange, handleBlur, handleSubmit, values }) => (
+                  <FormWrapper>
                     <FormField
-                      style={[focused === "password" && focusedFieldStyle]}
+                      style={[focused === "email" && focusedFieldStyle]}
                       onFocus={() => {
-                        setFocused("password");
+                        setFocused("email");
                       }}
-                      onChangeText={handleChange("password")}
+                      onChangeText={handleChange("email")}
                       onBlur={() => {
                         setFocused("");
-                        handleBlur("password");
+                        handleBlur("email");
                       }}
-                      value={values.password}
-                      placeholder="Password"
-                      secureTextEntry={!showPass}
+                      value={values.email}
+                      placeholder="E-mail"
+                      inputMode="email"
                     />
-                    <PasswordLink
-                      onPress={() => {
-                        setShowPass(!showPass);
-                      }}
-                    >
-                      <PassLinkText>
-                        {!showPass ? "Show password" : "Hide password"}
-                      </PassLinkText>
-                    </PasswordLink>
-                  </View>
-                  {!keyboardStatus && (
-                    <>
-                      <SubmitBtn onPress={handleSubmit} title="Submit">
-                        <SubmitBtnText>Sign in</SubmitBtnText>
-                      </SubmitBtn>
-                      <TouchOpWrapper onPress={() => {}}>
-                        <LinkText>Dont have account? Please register</LinkText>
-                      </TouchOpWrapper>
-                    </>
-                  )}
-                </FormWrapper>
-              )}
-            </Formik>
-          </RegFormView>
-        </ContainerViewMain>
-      </BackgroundComponent>
+                    <View>
+                      <FormField
+                        style={[focused === "password" && focusedFieldStyle]}
+                        onFocus={() => {
+                          setFocused("password");
+                        }}
+                        onChangeText={handleChange("password")}
+                        onBlur={() => {
+                          setFocused("");
+                          handleBlur("password");
+                        }}
+                        value={values.password}
+                        placeholder="Password"
+                        secureTextEntry={!showPass}
+                      />
+                      <PasswordLink
+                        onPress={() => {
+                          setShowPass(!showPass);
+                        }}
+                      >
+                        <PassLinkText>
+                          {!showPass ? "Show password" : "Hide password"}
+                        </PassLinkText>
+                      </PasswordLink>
+                    </View>
+                    <SubmitBtn onPress={handleSubmit} title="Submit">
+                      <SubmitBtnText>Sign in</SubmitBtnText>
+                    </SubmitBtn>
+                    <TouchOpWrapper onPress={() => {}}>
+                      <LinkText>Dont have account? Please register</LinkText>
+                    </TouchOpWrapper>
+                  </FormWrapper>
+                )}
+              </Formik>
+            </RegFormView>
+          </ContainerViewMain>
+        </BackgroundComponent>
+      </View>
     </TouchableWithoutFeedback>
   );
 };

@@ -1,10 +1,14 @@
-import React from "react";
+import "react-native-gesture-handler";
 import { useFonts } from "expo-font";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
-// import { Home } from "./src/components/Home";
+import { HomeScreen } from "./src/screens/HomeScreen";
 import { RegistrationScreen } from "./src/screens/RegistrationScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
 import { PostsScreen } from "./src/screens/PostsScreen";
+
+const Nav = createStackNavigator();
 
 const App = () => {
   const [fontsLoaded] = useFonts({
@@ -15,9 +19,27 @@ const App = () => {
   if (!fontsLoaded) {
     return null;
   }
-
-  return <RegistrationScreen />;
-  return <LoginScreen />;
+  return (
+    <NavigationContainer>
+      <Nav.Navigator initialRouteName="LoginScreen">
+        <Nav.Screen
+          name="RegistrationScreen"
+          component={RegistrationScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Nav.Screen
+          name="LoginScreen"
+          component={LoginScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Nav.Screen name="HomeScreen" component={HomeScreen} />
+      </Nav.Navigator>
+    </NavigationContainer>
+  );
   // return <PostsScreen />;
 };
 

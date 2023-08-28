@@ -13,3 +13,5 @@ export const HomeScreen = () => {
     </View>
   );
 };
+
+// PostsScreen;

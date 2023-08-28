@@ -3,11 +3,13 @@ import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
 import styled from "styled-components/native";
+import { useNavigation } from "@react-navigation/native";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
 const userAvatar = require("../imgs/user.jpg");
 
 export const RegistrationScreen = () => {
+  const navigation = useNavigation();
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [isAvatarSet, setIsAvatarSet] = useState(false);
   const [focused, setFocused] = useState("");
@@ -40,7 +42,9 @@ export const RegistrationScreen = () => {
           <ContainerViewMain
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <RegFormView style={keyboardStatus && [{ height: 380 }]}>
+            <RegFormView
+              style={keyboardStatus ? { height: 380 } : { height: 550 }}
+            >
               <AvatarView
                 onPress={() => {
                   setIsAvatarSet(!isAvatarSet);
@@ -66,6 +70,7 @@ export const RegistrationScreen = () => {
                 onSubmit={(values, { resetForm }) => {
                   console.log(values);
                   resetForm();
+                  navigation.navigate("HomeScreen");
                 }}
               >
                 {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -125,7 +130,9 @@ export const RegistrationScreen = () => {
                     <SubmitBtn onPress={handleSubmit} title="Submit">
                       <SubmitBtnText>Sign up</SubmitBtnText>
                     </SubmitBtn>
-                    <TouchOpWrapper onPress={() => {}}>
+                    <TouchOpWrapper
+                      onPress={() => navigation.navigate("LoginScreen")}
+                    >
                       <LinkText>Already registered? Please login</LinkText>
                     </TouchOpWrapper>
                   </FormWrapper>
@@ -145,8 +152,6 @@ const ContainerViewMain = styled.KeyboardAvoidingView`
   justify-content: end;
 `;
 const RegFormView = styled.View`
-  max-height: 550px;
-  height: 100%;
   padding: 0 16px 0 16px;
   justify-content: start;
   align-items: center;

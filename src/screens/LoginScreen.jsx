@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
 import { Formik } from "formik";
 import styled from "styled-components/native";
+import { useNavigation } from "@react-navigation/native";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
 
 export const LoginScreen = () => {
+  const navigation = useNavigation();
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [focused, setFocused] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -37,13 +39,16 @@ export const LoginScreen = () => {
           <ContainerViewMain
             behavior={Platform.OS === "ios" ? "padding" : "height"}
           >
-            <RegFormView style={keyboardStatus && [{ height: 260 }]}>
+            <RegFormView
+              style={keyboardStatus ? { height: 260 } : { height: 490 }}
+            >
               <TitleH1>Autorization</TitleH1>
               <Formik
                 initialValues={{ email: "", password: "" }}
                 onSubmit={(values, { resetForm }) => {
                   console.log(values);
                   resetForm();
+                  navigation.navigate("HomeScreen");
                 }}
               >
                 {({ handleChange, handleBlur, handleSubmit, values }) => (
@@ -90,7 +95,9 @@ export const LoginScreen = () => {
                     <SubmitBtn onPress={handleSubmit} title="Submit">
                       <SubmitBtnText>Sign in</SubmitBtnText>
                     </SubmitBtn>
-                    <TouchOpWrapper onPress={() => {}}>
+                    <TouchOpWrapper
+                      onPress={() => navigation.navigate("RegistrationScreen")}
+                    >
                       <LinkText>Dont have account? Please register</LinkText>
                     </TouchOpWrapper>
                   </FormWrapper>
@@ -111,8 +118,6 @@ const ContainerViewMain = styled.KeyboardAvoidingView`
 `;
 
 const RegFormView = styled.View`
-  max-height: 490px;
-  height: 100%;
   padding: 0 16px 0 16px;
   justify-content: start;
   align-items: center;

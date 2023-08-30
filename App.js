@@ -1,3 +1,4 @@
+import React from "react";
 import "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
@@ -6,7 +7,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { HomeScreen } from "./src/screens/HomeScreen";
 import { RegistrationScreen } from "./src/screens/RegistrationScreen";
 import { LoginScreen } from "./src/screens/LoginScreen";
-import { PostsScreen } from "./src/screens/PostsScreen";
+import { CommentsScreen } from "./src/screens/CommentsScreen";
+import { MapScreen } from "./src/screens/MapScreen";
+import { BackBtn } from "./src/components/BackBtn";
 
 const Nav = createStackNavigator();
 
@@ -23,6 +26,13 @@ const App = () => {
     <NavigationContainer>
       <Nav.Navigator initialRouteName="LoginScreen">
         <Nav.Screen
+          name="HomeScreen"
+          component={HomeScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Nav.Screen
           name="RegistrationScreen"
           component={RegistrationScreen}
           options={{
@@ -36,11 +46,33 @@ const App = () => {
             headerShown: false,
           }}
         />
-        <Nav.Screen name="HomeScreen" component={HomeScreen} />
+        <Nav.Screen
+          name="CommentsScreen"
+          component={CommentsScreen}
+          options={{
+            title: "Comments",
+            headerShown: true,
+            headerLeft: () => <BackBtn />,
+            headerStyle: {
+              borderBottomWidth: 1,
+            },
+          }}
+        />
+        <Nav.Screen
+          name="MapScreen"
+          component={MapScreen}
+          options={{
+            title: "Location",
+            headerShown: true,
+            headerLeft: () => <BackBtn />,
+            headerStyle: {
+              borderBottomWidth: 1,
+            },
+          }}
+        />
       </Nav.Navigator>
     </NavigationContainer>
   );
-  // return <PostsScreen />;
 };
 
 export default App;

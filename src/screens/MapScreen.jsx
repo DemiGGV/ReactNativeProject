@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import styled from "styled-components/native";
@@ -21,7 +21,6 @@ export const MapScreen = ({ route }) => {
           longitudeDelta: 0.0421,
         }}
         mapType="standard"
-        onMapReady={() => console.log("Map is ready")}
       >
         {coordinates && (
           <Marker

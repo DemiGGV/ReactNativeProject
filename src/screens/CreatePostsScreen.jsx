@@ -13,9 +13,16 @@ import {
 import styled from "styled-components/native";
 import { Formik } from "formik";
 import { Feather } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import { addPost } from "../redux/posts/postsOperations";
+import { getUser } from "../redux/user/authSelectors";
+import { uploadImage } from "../helpers/uploadImage";
+import { Loader } from "../components/Loader";
 
 export const CreatePostsScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [focused, setFocused] = useState("");
   const [isCamPermission, setIsCamPermission] = useState(null);
@@ -24,7 +31,6 @@ export const CreatePostsScreen = () => {
   const [camRef, setCamRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [photoUri, setPhotoUri] = useState(null);
-  const [location, setLocation] = useState(null);
 
   const focusedFieldStyle = {
     color: "#212121",
@@ -63,14 +69,13 @@ export const CreatePostsScreen = () => {
   }, []);
 
   const takePicture = async () => {
-    console.log("Shoot!");
     if (camRef) {
       const { uri } = await camRef.takePictureAsync();
       setPhotoUri(uri);
       await MediaLibrary.createAssetAsync(uri);
     }
   };
-  const publishPhoto = (values) => {
+  const publishPhoto = (values, { resetForm }) => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
@@ -82,18 +87,42 @@ export const CreatePostsScreen = () => {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
-      setLocation(coords);
+      try {
+        const imageURL = await uploadImage(photoUri);
+        if (!imageURL) return;
+        const post = {
+          userid: user.uid,
+          imageUri: imageURL,
+          title: values.name,
+          location: {
+            name: values.geoloc,
+            coordinates: coords,
+          },
+          comments: [],
+          likes: 0,
+        };
+        await dispatch(addPost(post)).unwrap();
+        setPhotoUri(null);
+        resetForm();
+        navigation.navigate("HomeScreen", { screen: "PostsScreen" });
+      } catch (err) {
+        let toast = Toast.show(err.message, {
+          duration: 1000,
+          backgroundColor: "#f02c2c",
+          shadowColor: "black",
+          position: Toast.positions.CENTER,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+        console.log("Can't send!");
+      }
     })();
-    setPhotoUri(null);
-    navigation.navigate("HomeScreen", { screen: "PostsScreen" });
   };
 
   if (isCamPermission === null) {
-    return (
-      <PendingContainer>
-        <Text>Loading...</Text>
-      </PendingContainer>
-    );
+    return <Loader />;
   }
   if (!isCamPermission) {
     return (
@@ -134,12 +163,7 @@ export const CreatePostsScreen = () => {
           <RegFormView>
             <Formik
               initialValues={{ name: "", geoloc: "" }}
-              onSubmit={(values, { resetForm }) => {
-                console.log("Submit!");
-                setFocused("");
-                resetForm();
-                publishPhoto(values);
-              }}
+              onSubmit={publishPhoto}
             >
               {({ handleChange, handleBlur, handleSubmit, values }) => (
                 <FormWrapper>
@@ -201,7 +225,11 @@ export const CreatePostsScreen = () => {
   );
 };
 
-const PendingContainer = styled.View``;
+const PendingContainer = styled.View`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
 const ContainerViewMain = styled.KeyboardAvoidingView`
   flex: 1;
   justify-content: flex-end;
@@ -282,7 +310,7 @@ const IconLoc = styled(Feather)`
   top: 28px;
   color: ${(props) => (props.st ? "#fff" : "#bdbdbd")};
 `;
-const SubmitBtn = styled.TouchableOpacity`
+const SubmitBtn = styled.Pressable`
   justify-content: center;
   margin-top: 32px;
   height: 50px;

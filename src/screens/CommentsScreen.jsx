@@ -1,36 +1,86 @@
 import React, { useState } from "react";
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-} from "react-native";
+import * as Crypto from "expo-crypto";
+import { Keyboard, TouchableWithoutFeedback } from "react-native";
 import styled from "styled-components/native";
 import { Feather } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
-export const CommentsScreen = ({ route }) => {
+import { getUser } from "../redux/user/authSelectors";
+import { editPost } from "../redux/posts/postsOperations";
+import { getCurrentPost, getPosts } from "../redux/posts/postsSelectors";
+
+export const CommentsScreen = () => {
   const [inputValue, setInputValue] = useState("");
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
-  let oddElement = true;
-  const { imageUri, comments } = route.params;
+  const user = useSelector(getUser);
+  const posts = useSelector(getPosts);
+  const currentPost = useSelector(getCurrentPost);
+  const dispatch = useDispatch();
+
+  const formatedTimestamp = () => {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hourCycle: "h24",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return new Date().toLocaleString("uk-UA", options);
+  };
+
+  const handlerAddComment = async () => {
+    const timeStamp = formatedTimestamp();
+    const comment = {
+      id: Crypto.randomUUID(),
+      uid: user.uid,
+      photoURL: user.photoURL,
+      message: inputValue.trim(),
+      timeStamp,
+    };
+    try {
+      setInputValue("");
+      Keyboard.dismiss();
+      await dispatch(editPost({ id: posts[currentPost].id, comment })).unwrap();
+    } catch (err) {
+      let toast = Toast.show(err.message, {
+        duration: 1000,
+        backgroundColor: "#f02c2c",
+        shadowColor: "black",
+        position: Toast.positions.CENTER,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+      });
+      console.log("Can't add comment!");
+    }
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ContainerViewMain
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <Photo source={imageUri} />
+      <ContainerViewMain>
+        <Photo
+          source={{ uri: posts[currentPost].imageUri }}
+          resizeMode="cover"
+        />
         <ChatScroll
-          data={comments}
+          data={posts[currentPost].comments}
           renderItem={({ item }) => {
-            oddElement = !oddElement;
+            const oddElement = item.uid === user.uid;
             return (
-              <MessageView st={oddElement}>
-                <AvatarImage source={item.user} />
-                <CommentView>
-                  <CommentText>{item.comment}</CommentText>
-                  <TimeText st={oddElement}>{item.time}</TimeText>
-                </CommentView>
-              </MessageView>
+              <TouchableWithoutFeedback onPress={() => {}}>
+                <MessageView st={oddElement}>
+                  <AvatarImage
+                    source={{ uri: item.photoURL }}
+                    resizeMode="cover"
+                  />
+                  <CommentView>
+                    <CommentText>{item.message}</CommentText>
+                    <TimeText st={oddElement}>{item.timeStamp}</TimeText>
+                  </CommentView>
+                </MessageView>
+              </TouchableWithoutFeedback>
             );
           }}
           keyExtractor={(item) => item.id}
@@ -44,10 +94,9 @@ export const CommentsScreen = ({ route }) => {
             placeholder="Comment..."
           />
           <SendBtn
-            onPress={() => {
-              setInputValue("");
-              Keyboard.dismiss();
-              console.log(inputValue);
+            onPress={handlerAddComment}
+            style={{
+              backgroundColor: !!inputValue ? "#ff6c00" : "#21212180",
             }}
           >
             <ArrowUp name="arrow-up" size={24} />
@@ -58,8 +107,7 @@ export const CommentsScreen = ({ route }) => {
   );
 };
 
-const PendingContainer = styled.View``;
-const ContainerViewMain = styled.KeyboardAvoidingView`
+const ContainerViewMain = styled.View`
   flex: 1;
   justify-content: flex-end;
   align-items: center;
@@ -67,7 +115,10 @@ const ContainerViewMain = styled.KeyboardAvoidingView`
   padding: 32px 16px 20px 16px;
 `;
 const Photo = styled.Image`
-  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 343px;
+  height: 240px;
   border-radius: 8px;
   margin-bottom: 32px;
 `;
@@ -84,6 +135,7 @@ const MessageView = styled.View`
 `;
 const AvatarImage = styled.Image`
   width: 28px;
+  height: 28px;
 `;
 const CommentView = styled.View`
   background-color: #00000006;
@@ -130,7 +182,7 @@ const SendBtn = styled.TouchableOpacity`
   align-items: center;
   width: 34px;
   height: 34px;
-  background-color: #ff6c00;
+  /* background-color: #ff6c00; */
   border-radius: 17px;
 `;
 

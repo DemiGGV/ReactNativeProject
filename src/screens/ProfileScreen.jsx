@@ -1,136 +1,66 @@
-import React, { useEffect, useState } from "react";
-import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import { Alert, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import styled from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
-const userAvatar = require("../imgs/user.jpg");
-const forest = require("../imgs/forest.jpg");
-const down = require("../imgs/down.jpg");
-const oldHouse = require("../imgs/oldHouse.jpg");
-const user1 = require("../imgs/user1.png");
-const user2 = require("../imgs/user2.png");
-
-const posts = [
-  {
-    id: 1,
-    imageUri: forest,
-    title: "Forest",
-    location: {
-      name: "Ukraine",
-      coordinates: {
-        latitude: "48.9215",
-        longitude: "24.70972",
-      },
-    },
-    comments: [
-      {
-        id: 1,
-        user: user1,
-        comment:
-          "Really love your most recent photo. I've been trying to capture the same thing for a few months and would love some tips!",
-        time: "09 червня, 2020  08:40",
-      },
-      {
-        id: 2,
-        user: user2,
-        comment:
-          "A fast 50mm like f1.8 would help with the bokeh. I've been using primes as they tend to get a bit sharper images.",
-        time: "09 червня, 2020 | 09:14",
-      },
-      {
-        id: 3,
-        user: user1,
-        comment: "Thank you! That was very helpful!",
-        time: "09 червня, 2020  09:40",
-      },
-      {
-        id: 4,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-        time: "09 червня, 2020  10:40",
-      },
-    ],
-    likes: 153,
-  },
-  {
-    id: 2,
-    imageUri: down,
-    title: "Down",
-    location: {
-      name: "Black See, Ukraine",
-      coordinates: {
-        latitude: "46.482952",
-        longitude: "30.712481",
-      },
-    },
-    comments: [
-      {
-        id: 1,
-        user: user1,
-        comment: "Lorem ipsum dolor sit amet.",
-        time: "09 червня, 2020  08:40",
-      },
-      {
-        id: 2,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet consectetur adipisicing.",
-        time: "09 червня, 2020 | 09:14",
-      },
-      {
-        id: 3,
-        user: user1,
-        comment: "Lorem, ipsum dolor.",
-        time: "09 червня, 2020  09:40",
-      },
-      {
-        id: 4,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-        time: "09 червня, 2020  10:40",
-      },
-    ],
-    likes: 200,
-  },
-  {
-    id: 3,
-    imageUri: oldHouse,
-    title: "Old house in Venice",
-    location: {
-      name: "Venice, Italy",
-      coordinates: {
-        latitude: "45.438759",
-        longitude: "12.327145",
-      },
-    },
-    comments: [
-      {
-        id: 1,
-        user: user1,
-        comment: "Lorem ipsum dolor sit amet.",
-        time: "09 червня, 2020  08:40",
-      },
-      {
-        id: 2,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet consectetur adipisicing.",
-        time: "09 червня, 2020 | 09:14",
-      },
-      {
-        id: 3,
-        user: user1,
-        comment: "Lorem, ipsum dolor.",
-        time: "09 червня, 2020  09:40",
-      },
-    ],
-    likes: 0,
-  },
-];
+import { getUser } from "../redux/user/authSelectors";
+import { auth } from "../../config";
+import { getUserPosts } from "../redux/posts/postsSelectors";
+import {
+  deletePost,
+  fetchAllPosts,
+  incrementLikes,
+} from "../redux/posts/postsOperations";
+import { setCurrentID } from "../redux/posts/postsSlice";
+import { LogoutBtn } from "../components/LogoutBtn";
+import { Loader } from "../components/Loader";
+// import { Loader } from "../components/Loader";
 
 export const ProfileScreen = () => {
   const navigation = useNavigation();
-  const [isAvatarSet, setIsAvatarSet] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const posts = useSelector(getUserPosts);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(() => {
+      dispatch(fetchAllPosts());
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    return <Loader />;
+  }
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete post",
+      "Are you sure to delete this post?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => {},
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: () => {
+            dispatch(
+              deletePost({
+                id: post.id,
+                imageURL: post.imageUri,
+              })
+            );
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -139,88 +69,100 @@ export const ProfileScreen = () => {
           <ProfileView>
             <AvatarView
               onPress={() => {
-                setIsAvatarSet(!isAvatarSet);
+                console.log("Avatar box touched!");
               }}
             >
-              <AvatarImage source={userAvatar} resizeMode="cover" />
+              <AvatarImage
+                source={{ uri: user?.photoURL }}
+                resizeMode="cover"
+              />
               <TouchableOpacityIcon
                 onPress={() => {
-                  console.log("Change the Avatar!");
+                  console.log("IconAdd touched!");
                 }}
               >
                 <Icon name="x-circle" size={26} />
               </TouchableOpacityIcon>
             </AvatarView>
-            <LogoutBtn
-              onPress={() => {
-                navigation.navigate("LoginScreen");
-              }}
-            >
-              <Icon name="log-out" size={24} />
-            </LogoutBtn>
-            <TitleH1>Natali Romanova</TitleH1>
-            <UserPostsList
-              data={posts}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <PostView key={item.id}>
-                  <PostImage source={item.imageUri} resizeMode="cover" />
-                  <PostTitle>{item.title}</PostTitle>
-                  <PostData>
-                    <CommentsView
-                      onPress={() => {
-                        navigation.navigate("CommentsScreen", {
-                          imageUri: item.imageUri,
-                          comments: item.comments,
-                        });
-                      }}
-                    >
-                      <Icon
-                        name="message-circle"
-                        size={24}
-                        style={{
-                          color: item.comments ? "#ff6c00" : "#21212180",
-                        }}
+            <LogoutBtnView>
+              <LogoutBtn />
+            </LogoutBtnView>
+            <TitleH1>{user?.displayName}</TitleH1>
+            <UserPostsList>
+              {posts?.map((post) => (
+                <TouchableWithoutFeedback key={post.id} onPress={() => {}}>
+                  <PostView>
+                    <DeletePress onPress={handleDelete}>
+                      <PostImage
+                        source={{ uri: post.imageUri }}
+                        resizeMode="cover"
                       />
-                      <CountersText
-                        style={{
-                          color: item.comments ? "#212121" : "#21212180",
+                    </DeletePress>
+                    <PostTitle>{post.title}</PostTitle>
+                    <PostData>
+                      <DataView
+                        onPress={() => {
+                          dispatch(setCurrentID(post.id));
+                          navigation.navigate("CommentsScreen");
                         }}
                       >
-                        {item.comments.length}
-                      </CountersText>
-                    </CommentsView>
-                    <LikesView>
-                      <Icon
-                        name="thumbs-up"
-                        size={24}
-                        style={{
-                          color: item.likes ? "#ff6c00" : "#21212180",
-                        }}
-                      />
-                      <CountersText
-                        style={{
-                          color: item.likes ? "#212121" : "#21212180",
+                        <Icon
+                          name="message-circle"
+                          size={24}
+                          style={{
+                            color: !!post.comments.length
+                              ? "#ff6c00"
+                              : "#21212180",
+                          }}
+                        />
+                        <CommentsText
+                          style={{
+                            color: !!post.comments.length
+                              ? "#212121"
+                              : "#21212180",
+                          }}
+                        >
+                          {post.comments.length}
+                        </CommentsText>
+                      </DataView>
+
+                      <DataView
+                        onPress={() => {
+                          dispatch(incrementLikes({ id: post.id }));
                         }}
                       >
-                        {item.likes}
-                      </CountersText>
-                    </LikesView>
-                    <LocationView
-                      onPress={() => {
-                        navigation.navigate("MapScreen", {
-                          coordinates: item.location.coordinates,
-                        });
-                      }}
-                      style={{ color: "#21212180" }}
-                    >
-                      <Icon name="map-pin" size={24} />
-                      <LocationText>{item.location.name}</LocationText>
-                    </LocationView>
-                  </PostData>
-                </PostView>
-              )}
-            />
+                        <Icon
+                          name="thumbs-up"
+                          size={24}
+                          style={{
+                            color: post.likes ? "#ff6c00" : "#21212180",
+                          }}
+                        />
+                        <CommentsText
+                          style={{
+                            color: post.likes ? "#212121" : "#21212180",
+                          }}
+                        >
+                          {post.likes}
+                        </CommentsText>
+                      </DataView>
+
+                      <LocationView
+                        onPress={() => {
+                          navigation.navigate("MapScreen", {
+                            coordinates: post.location.coordinates,
+                          });
+                        }}
+                        style={{ color: "#21212180" }}
+                      >
+                        <Icon name="map-pin" size={24} />
+                        <LocationText>{post.location.name}</LocationText>
+                      </LocationView>
+                    </PostData>
+                  </PostView>
+                </TouchableWithoutFeedback>
+              ))}
+            </UserPostsList>
           </ProfileView>
         </ContainerViewMain>
       </BackgroundComponent>
@@ -230,9 +172,10 @@ export const ProfileScreen = () => {
 
 const ContainerViewMain = styled.View`
   margin-top: 120px;
-  margin-bottom: 120px;
+  /* margin-bottom: 120px; */
 `;
 const ProfileView = styled.View`
+  height: 100%;
   padding: 90px 16px 0 16px;
   justify-content: start;
   align-items: center;
@@ -268,10 +211,10 @@ const Icon = styled(Feather)`
   font-size: 25px;
   color: #bdbdbd;
 `;
-const LogoutBtn = styled.TouchableOpacity`
+const LogoutBtnView = styled.View`
   position: absolute;
   top: 22px;
-  right: 16px;
+  right: 0;
 `;
 const TitleH1 = styled.Text`
   color: #212121;
@@ -280,15 +223,22 @@ const TitleH1 = styled.Text`
   font-size: 30px;
   margin-bottom: 32px;
 `;
-const UserPostsList = styled.FlatList`
+//+++ posts
+const UserPostsList = styled.ScrollView`
+  margin-top: 32px;
   width: 100%;
-  height: auto;
 `;
 const PostView = styled.View`
   margin-bottom: 32px;
 `;
-const PostImage = styled.Image`
+const DeletePress = styled.Pressable`
   width: 100%;
+`;
+const PostImage = styled.Image`
+  margin-left: auto;
+  margin-right: auto;
+  width: 343px;
+  height: 240px;
   border-radius: 8px;
 `;
 const PostTitle = styled.Text`
@@ -301,19 +251,14 @@ const PostTitle = styled.Text`
 const PostData = styled.View`
   margin-top: 8px;
   flex-direction: row;
+  column-gap: 24px;
   justify-content: space-between;
 `;
-const CommentsView = styled.TouchableOpacity`
+const DataView = styled.TouchableOpacity`
   flex-direction: row;
 `;
-const LikesView = styled.TouchableOpacity`
-  margin-left: 24px;
-  flex-direction: row;
-  align-content: baseline;
-`;
-const CountersText = styled.Text`
+const CommentsText = styled.Text`
   margin-left: 6px;
-  margin-top: 2px;
   font-family: "Roboto-Regular";
   font-size: 16px;
 `;
@@ -323,13 +268,129 @@ const LocationView = styled.TouchableOpacity`
 `;
 const LocationText = styled.Text`
   margin-left: 6px;
-  margin-top: 2px;
   font-family: "Roboto-Regular";
   font-size: 16px;
   color: #212121;
   text-decoration: underline;
 `;
 
+// <UserPostsList
+//   data={posts}
+//   keyExtractor={(item) => item.id}
+//   renderItem={({ item }) => (
+//     <PostView key={item.id}>
+//       <PostImage source={item.imageUri} resizeMode="cover" />
+//       <PostTitle>{item.title}</PostTitle>
+//       <PostData>
+//         <CommentsView
+//           onPress={() => {
+//             navigation.navigate("CommentsScreen", {
+//               imageUri: item.imageUri,
+//               comments: item.comments,
+//             });
+//           }}
+//         >
+//           <Icon
+//             name="message-circle"
+//             size={24}
+//             style={{
+//               color: item.comments ? "#ff6c00" : "#21212180",
+//             }}
+//           />
+//           <CountersText
+//             style={{
+//               color: item.comments ? "#212121" : "#21212180",
+//             }}
+//           >
+//             {item.comments.length}
+//           </CountersText>
+//         </CommentsView>
+//         <LikesView>
+//           <Icon
+//             name="thumbs-up"
+//             size={24}
+//             style={{
+//               color: item.likes ? "#ff6c00" : "#21212180",
+//             }}
+//           />
+//           <CountersText
+//             style={{
+//               color: item.likes ? "#212121" : "#21212180",
+//             }}
+//           >
+//             {item.likes}
+//           </CountersText>
+//         </LikesView>
+//         <LocationView
+//           onPress={() => {
+//             navigation.navigate("MapScreen", {
+//               coordinates: item.location.coordinates,
+//             });
+//           }}
+//           style={{ color: "#21212180" }}
+//         >
+//           <Icon name="map-pin" size={24} />
+//           <LocationText>{item.location.name}</LocationText>
+//         </LocationView>
+//       </PostData>
+//     </PostView>
+//   )}
+// />
+
 // const Icon = styled(Feather)`
 //   color: #21212180;
 // `;
+
+// const UserPostsList = styled.FlatList`
+//   width: 100%;
+//   height: auto;
+// `;
+// const PostView = styled.View`
+//   margin-bottom: 32px;
+// `;
+// const PostImage = styled.Image`
+//   width: 100%;
+//   border-radius: 8px;
+// `;
+// const PostTitle = styled.Text`
+//   margin-top: 8px;
+//   color: #212121;
+//   font-family: "Roboto-Medium";
+//   font-weight: bold;
+//   font-size: 16px;
+// `;
+// const PostData = styled.View`
+//   margin-top: 8px;
+//   flex-direction: row;
+//   justify-content: space-between;
+// `;
+// const CommentsView = styled.TouchableOpacity`
+//   flex-direction: row;
+// `;
+// const LikesView = styled.TouchableOpacity`
+//   margin-left: 24px;
+//   flex-direction: row;
+//   align-content: baseline;
+// `;
+// const CountersText = styled.Text`
+//   margin-left: 6px;
+//   margin-top: 2px;
+//   font-family: "Roboto-Regular";
+//   font-size: 16px;
+// `;
+// const LocationView = styled.TouchableOpacity`
+//   margin-left: auto;
+//   flex-direction: row;
+// `;
+// const LocationText = styled.Text`
+//   margin-left: 6px;
+//   margin-top: 2px;
+//   font-family: "Roboto-Regular";
+//   font-size: 16px;
+//   color: #212121;
+//   text-decoration: underline;
+// `;
+
+// // const Icon = styled(Feather)`
+// //   color: #21212180;
+// // `;

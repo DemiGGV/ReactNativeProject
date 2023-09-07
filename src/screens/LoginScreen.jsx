@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
 import { Formik } from "formik";
 import styled from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
+import { loginUser } from "../redux/user/authOperations";
+import { auth } from "../../config";
 
 export const LoginScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [focused, setFocused] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -32,6 +36,19 @@ export const LoginScreen = () => {
     };
   }, []);
 
+  const userAuth = auth.currentUser;
+  if (userAuth) {
+    navigation.navigate("HomeScreen", { screen: "PostsScreen" });
+  }
+
+  const handleSubmit = async (values, { resetForm }) => {
+    try {
+      await dispatch(loginUser(values)).unwrap();
+      resetForm();
+      navigation.navigate("HomeScreen", { screen: "PostsScreen" });
+    } catch (rejectedValueOrSerializedError) {}
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={{ flex: 1 }}>
@@ -45,11 +62,7 @@ export const LoginScreen = () => {
               <TitleH1>Autorization</TitleH1>
               <Formik
                 initialValues={{ email: "", password: "" }}
-                onSubmit={(values, { resetForm }) => {
-                  console.log(values);
-                  resetForm();
-                  navigation.navigate("HomeScreen");
-                }}
+                onSubmit={handleSubmit}
               >
                 {({ handleChange, handleBlur, handleSubmit, values }) => (
                   <FormWrapper>

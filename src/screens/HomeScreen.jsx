@@ -1,7 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, View } from "react-native";
-import styled from "styled-components/native";
 import { Feather } from "@expo/vector-icons";
 
 import { ProfileScreen } from "./ProfileScreen";
@@ -123,7 +122,3 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
 });
-
-// const Icon = styled(Feather)`
-//   color: #21212180;
-// `;

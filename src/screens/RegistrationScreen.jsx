@@ -1,15 +1,28 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
+import styled from "styled-components/native";
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
-import styled from "styled-components/native";
-import { useNavigation } from "@react-navigation/native";
+import Toast from "react-native-root-toast";
+import md5 from "md5";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
-const userAvatar = require("../imgs/user.jpg");
+import { registerUser } from "../redux/user/authOperations";
+
+const userAvatarURL = (email) => {
+  const AVATAR_URL = "https://www.gravatar.com/avatar/";
+  const AVATAR_SIZE = "120";
+  const AVATAR_OPTS = "&r=pg&d=wavatar";
+
+  const userHashEmail = md5(email.trim().toLowerCase());
+  return `${AVATAR_URL}${userHashEmail}?s=${AVATAR_SIZE}${AVATAR_OPTS}`;
+};
 
 export const RegistrationScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [isAvatarSet, setIsAvatarSet] = useState(false);
   const [focused, setFocused] = useState("");
@@ -34,6 +47,29 @@ export const RegistrationScreen = () => {
       hideKBSubscription.remove();
     };
   }, []);
+
+  const handleSubmit = async (values, { resetForm }) => {
+    if (!values.displayName) {
+      let toast = Toast.show("Input Your name please", {
+        duration: 1000,
+        backgroundColor: "#f02c2c",
+        shadowColor: "black",
+        position: Toast.positions.CENTER,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+      });
+      return;
+    }
+    values.photoURL = userAvatarURL(values.email);
+    try {
+      await dispatch(registerUser(values)).unwrap();
+
+      resetForm();
+      navigation.navigate("HomeScreen");
+    } catch (rejectedValueOrSerializedError) {}
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -66,26 +102,22 @@ export const RegistrationScreen = () => {
               </AvatarView>
               <TitleH1>Registration</TitleH1>
               <Formik
-                initialValues={{ login: "", email: "", password: "" }}
-                onSubmit={(values, { resetForm }) => {
-                  console.log(values);
-                  resetForm();
-                  navigation.navigate("HomeScreen");
-                }}
+                initialValues={{ displayName: "", email: "", password: "" }}
+                onSubmit={handleSubmit}
               >
                 {({ handleChange, handleBlur, handleSubmit, values }) => (
                   <FormWrapper>
                     <FormField
-                      style={[focused === "login" && focusedFieldStyle]}
+                      style={[focused === "displayName" && focusedFieldStyle]}
                       onFocus={() => {
-                        setFocused("login");
+                        setFocused("displayName");
                       }}
-                      onChangeText={handleChange("login")}
+                      onChangeText={handleChange("displayName")}
                       onBlur={() => {
                         setFocused("");
-                        handleBlur("login");
+                        handleBlur("displayName");
                       }}
-                      value={values.login}
+                      value={values.displayName}
                       placeholder="Login"
                     />
                     <FormField

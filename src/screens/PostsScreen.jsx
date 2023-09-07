@@ -1,214 +1,111 @@
-import React from "react";
-import styled from "styled-components/native";
-import { Feather } from "@expo/vector-icons";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
+import { TouchableWithoutFeedback } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import styled from "styled-components/native";
 
-const userAvatar = require("../imgs/user.jpg");
-const forest = require("../imgs/forest.jpg");
-const down = require("../imgs/down.jpg");
-const oldHouse = require("../imgs/oldHouse.jpg");
-const user1 = require("../imgs/user1.png");
-const user2 = require("../imgs/user2.png");
-
-const user = {
-  name: "Natali Romanova",
-  email: "email@example.com",
-  avatar: userAvatar,
-};
-const posts = [
-  {
-    id: 1,
-    imageUri: forest,
-    title: "Forest",
-    location: {
-      name: "Ivano-Frankivs'k Region, Ukraine",
-      coordinates: {
-        latitude: "48.9215",
-        longitude: "24.70972",
-      },
-    },
-    comments: [
-      {
-        id: 1,
-        user: user1,
-        comment:
-          "Really love your most recent photo. I've been trying to capture the same thing for a few months and would love some tips!",
-        time: "09 червня, 2020  08:40",
-      },
-      {
-        id: 2,
-        user: user2,
-        comment:
-          "A fast 50mm like f1.8 would help with the bokeh. I've been using primes as they tend to get a bit sharper images.",
-        time: "09 червня, 2020 | 09:14",
-      },
-      {
-        id: 3,
-        user: user1,
-        comment: "Thank you! That was very helpful!",
-        time: "09 червня, 2020  09:40",
-      },
-      {
-        id: 4,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-        time: "09 червня, 2020  10:40",
-      },
-    ],
-    likes: 153,
-  },
-  {
-    id: 2,
-    imageUri: down,
-    title: "Down",
-    location: {
-      name: "Black See, Ukraine",
-      coordinates: {
-        latitude: "46.482952",
-        longitude: "30.712481",
-      },
-    },
-    comments: [
-      {
-        id: 1,
-        user: user1,
-        comment: "Lorem ipsum dolor sit amet.",
-        time: "09 червня, 2020  08:40",
-      },
-      {
-        id: 2,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet consectetur adipisicing.",
-        time: "09 червня, 2020 | 09:14",
-      },
-      {
-        id: 3,
-        user: user1,
-        comment: "Lorem, ipsum dolor.",
-        time: "09 червня, 2020  09:40",
-      },
-      {
-        id: 4,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-        time: "09 червня, 2020  10:40",
-      },
-    ],
-    likes: 200,
-  },
-  {
-    id: 3,
-    imageUri: oldHouse,
-    title: "Old house in Venice",
-    location: {
-      name: "Venice, Italy",
-      coordinates: {
-        latitude: "45.438759",
-        longitude: "12.327145",
-      },
-    },
-    comments: [
-      {
-        id: 1,
-        user: user1,
-        comment: "Lorem ipsum dolor sit amet.",
-        time: "09 червня, 2020  08:40",
-      },
-      {
-        id: 2,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet consectetur adipisicing.",
-        time: "09 червня, 2020 | 09:14",
-      },
-      {
-        id: 3,
-        user: user1,
-        comment: "Lorem, ipsum dolor.",
-        time: "09 червня, 2020  09:40",
-      },
-      {
-        id: 4,
-        user: user2,
-        comment: "Lorem ipsum dolor sit amet, consectetur adipisicing.",
-        time: "09 червня, 2020  10:40",
-      },
-    ],
-    likes: 200,
-  },
-];
+import { getUser } from "../redux/user/authSelectors";
+import { auth } from "../../config";
+import { getPosts } from "../redux/posts/postsSelectors";
+import { fetchAllPosts, incrementLikes } from "../redux/posts/postsOperations";
+import { setCurrentID } from "../redux/posts/postsSlice";
+import { Loader } from "../components/Loader";
 
 export const PostsScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const user = useSelector(getUser);
+  const posts = useSelector(getPosts);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(() => {
+      dispatch(fetchAllPosts());
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) null;
 
   return (
     <MiddleView>
       <UserView>
-        <AvatarImage source={user.avatar} resizeMode="cover" />
+        <AvatarImage source={{ uri: user?.photoURL }} resizeMode="cover" />
         <UserDataView>
-          <UserNameText>{user.name}</UserNameText>
-          <UserEmailText>{user.email}</UserEmailText>
+          <UserNameText>{user?.displayName}</UserNameText>
+          <UserEmailText>{user?.email}</UserEmailText>
         </UserDataView>
       </UserView>
-      <UserPostsList>
-        {posts.map((post) => (
-          <PostView key={post.id}>
-            <PostImage source={post.imageUri} resizeMode="cover" />
-            <PostTitle>{post.title}</PostTitle>
-            <PostData>
-              <CommentsView
-                onPress={() => {
-                  navigation.navigate("CommentsScreen", {
-                    imageUri: post.imageUri,
-                    comments: post.comments,
-                  });
-                }}
-              >
-                <Icon
-                  name="message-circle"
-                  size={24}
-                  style={{
-                    color: post.comments ? "#ff6c00" : "#21212180",
-                  }}
-                />
-                <CommentsText
-                  style={{
-                    color: post.comments ? "#212121" : "#21212180",
-                  }}
-                >
-                  {post.comments.length}
-                </CommentsText>
-              </CommentsView>
-              {/* <LikesView>
-                <Icon
-                  name="thumbs-up"
-                  size={24}
-                  style={{
-                    color: item.likes ? "#ff6c00" : "#21212180",
-                  }}
-                />
-                <CommentsText
-                  style={{
-                    color: item.likes ? "#212121" : "#21212180",
-                  }}
-                >
-                  {item.likes}
-                </CommentsText>
-              </LikesView> */}
-              <LocationView
-                onPress={() => {
-                  navigation.navigate("MapScreen", {
-                    coordinates: post.location.coordinates,
-                  });
-                }}
-                style={{ color: "#21212180" }}
-              >
-                <Icon name="map-pin" size={24} />
-                <LocationText>{post.location.name}</LocationText>
-              </LocationView>
-            </PostData>
-          </PostView>
-        ))}
-      </UserPostsList>
+      {!posts ? (
+        <Loader />
+      ) : (
+        <UserPostsList>
+          {posts?.map((post) => (
+            <TouchableWithoutFeedback key={post.id} onPress={() => {}}>
+              <PostView>
+                <PostImage source={{ uri: post.imageUri }} resizeMode="cover" />
+                <PostTitle>{post.title}</PostTitle>
+                <PostData>
+                  <DataView
+                    onPress={() => {
+                      dispatch(setCurrentID(post.id));
+                      navigation.navigate("CommentsScreen");
+                    }}
+                  >
+                    <Icon
+                      name="message-circle"
+                      size={24}
+                      style={{
+                        color: !!post.comments.length ? "#ff6c00" : "#21212180",
+                      }}
+                    />
+                    <CommentsText
+                      style={{
+                        color: !!post.comments.length ? "#212121" : "#21212180",
+                      }}
+                    >
+                      {post.comments.length}
+                    </CommentsText>
+                  </DataView>
+
+                  <DataView
+                    onPress={() => {
+                      dispatch(incrementLikes({ id: post.id }));
+                    }}
+                  >
+                    <Icon
+                      name="thumbs-up"
+                      size={24}
+                      style={{
+                        color: post.likes ? "#ff6c00" : "#21212180",
+                      }}
+                    />
+                    <CommentsText
+                      style={{
+                        color: post.likes ? "#212121" : "#21212180",
+                      }}
+                    >
+                      {post.likes}
+                    </CommentsText>
+                  </DataView>
+
+                  <LocationView
+                    onPress={() => {
+                      navigation.navigate("MapScreen", {
+                        coordinates: post.location.coordinates,
+                      });
+                    }}
+                    style={{ color: "#21212180" }}
+                  >
+                    <Icon name="map-pin" size={24} />
+                    <LocationText>{post.location.name}</LocationText>
+                  </LocationView>
+                </PostData>
+              </PostView>
+            </TouchableWithoutFeedback>
+          ))}
+        </UserPostsList>
+      )}
     </MiddleView>
   );
 };
@@ -258,7 +155,10 @@ const PostView = styled.View`
   margin-bottom: 32px;
 `;
 const PostImage = styled.Image`
-  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 343px;
+  height: 240px;
   border-radius: 8px;
 `;
 const PostTitle = styled.Text`
@@ -271,9 +171,10 @@ const PostTitle = styled.Text`
 const PostData = styled.View`
   margin-top: 8px;
   flex-direction: row;
+  column-gap: 24px;
   justify-content: space-between;
 `;
-const CommentsView = styled.TouchableOpacity`
+const DataView = styled.TouchableOpacity`
   flex-direction: row;
 `;
 const CommentsText = styled.Text`
@@ -282,6 +183,7 @@ const CommentsText = styled.Text`
   font-size: 16px;
 `;
 const LocationView = styled.TouchableOpacity`
+  margin-left: auto;
   flex-direction: row;
 `;
 const LocationText = styled.Text`
@@ -295,14 +197,3 @@ const LocationText = styled.Text`
 const Icon = styled(Feather)`
   color: #21212180;
 `;
-
-// <View>
-//   <Icon
-//     name="thumbs-up"
-//     size={24}
-//     style={{
-//       color: post.comments ? "#ff6c00" : "#21212180",
-//     }}
-//   />
-//   <CountersText>{post.likes}</CountersText>
-// </View>;

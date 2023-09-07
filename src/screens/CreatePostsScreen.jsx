@@ -25,6 +25,7 @@ export const CreatePostsScreen = () => {
   const user = useSelector(getUser);
   const [keyboardStatus, setKeyboardStatus] = useState(false);
   const [focused, setFocused] = useState("");
+  const [isDisableButtons, setIsDisableButtons] = useState(true);
   const [isCamPermission, setIsCamPermission] = useState(null);
   const [isMediaPermission, setIsMediaPermission] = useState(null);
   const [isLocationPermission, setIsLocationPermission] = useState(null);
@@ -73,10 +74,13 @@ export const CreatePostsScreen = () => {
       const { uri } = await camRef.takePictureAsync();
       setPhotoUri(uri);
       await MediaLibrary.createAssetAsync(uri);
+      setIsDisableButtons(false);
     }
   };
+
   const publishPhoto = (values, { resetForm }) => {
     (async () => {
+      setIsDisableButtons(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         console.log("Permission to access location was denied");
@@ -106,6 +110,7 @@ export const CreatePostsScreen = () => {
         resetForm();
         navigation.navigate("HomeScreen", { screen: "PostsScreen" });
       } catch (err) {
+        setIsDisableButtons(false);
         let toast = Toast.show(err.message, {
           duration: 1000,
           backgroundColor: "#f02c2c",
@@ -177,7 +182,7 @@ export const CreatePostsScreen = () => {
                       setFocused("");
                       handleBlur("name");
                     }}
-                    editable={!!photoUri}
+                    editable={!isDisableButtons}
                     value={values.name}
                     placeholder="Photo title"
                   />
@@ -192,7 +197,7 @@ export const CreatePostsScreen = () => {
                         setFocused("");
                         handleBlur("geoloc");
                       }}
-                      editable={!!photoUri}
+                      editable={!isDisableButtons}
                       value={values.geoloc}
                       placeholder="Location"
                     />
@@ -201,8 +206,8 @@ export const CreatePostsScreen = () => {
                   <SubmitBtn
                     onPress={handleSubmit}
                     title="Publish"
-                    style={[!photoUri && pendingStyle]}
-                    disabled={!photoUri}
+                    style={[isDisableButtons && pendingStyle]}
+                    disabled={isDisableButtons}
                   >
                     <SubmitBtnText st={photoUri}>Publish</SubmitBtnText>
                   </SubmitBtn>

@@ -7,7 +7,6 @@ import styled from "styled-components/native";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
 import { loginUser } from "../redux/user/authOperations";
-import { auth } from "../../config";
 
 export const LoginScreen = () => {
   const navigation = useNavigation();
@@ -36,16 +35,11 @@ export const LoginScreen = () => {
     };
   }, []);
 
-  const userAuth = auth.currentUser;
-  if (userAuth) {
-    navigation.navigate("HomeScreen", { screen: "PostsScreen" });
-  }
-
   const handleSubmit = async (values, { resetForm }) => {
     try {
       await dispatch(loginUser(values)).unwrap();
       resetForm();
-      navigation.navigate("HomeScreen", { screen: "PostsScreen" });
+      navigation.navigate("HomeScreen");
     } catch (rejectedValueOrSerializedError) {}
   };
 

@@ -1,5 +1,5 @@
 import { Dimensions } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import styled from "styled-components/native";
 
 export const MapScreen = ({ route }) => {
@@ -9,6 +9,7 @@ export const MapScreen = ({ route }) => {
   return (
     <MapSView>
       <MapView
+        provider={PROVIDER_GOOGLE}
         style={{
           width: Dimensions.get("window").width,
           height: Dimensions.get("window").height,

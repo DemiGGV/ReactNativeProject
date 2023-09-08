@@ -11,6 +11,7 @@ import { getPosts } from "../redux/posts/postsSelectors";
 import { fetchAllPosts, incrementLikes } from "../redux/posts/postsOperations";
 import { setCurrentID } from "../redux/posts/postsSlice";
 import { Loader } from "../components/Loader";
+const placeholder = require("../../public/placeholder.jpg");
 
 export const PostsScreen = () => {
   const navigation = useNavigation();
@@ -43,7 +44,11 @@ export const PostsScreen = () => {
           {posts?.map((post) => (
             <TouchableWithoutFeedback key={post.id} onPress={() => {}}>
               <PostView>
-                <PostImage source={{ uri: post.imageUri }} resizeMode="cover" />
+                <PostImage
+                  defaultSource={{ placeholder }}
+                  source={{ uri: post.imageUri }}
+                  resizeMode="cover"
+                />
                 <PostTitle>{post.title}</PostTitle>
                 <PostData>
                   <DataView

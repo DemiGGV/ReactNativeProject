@@ -83,7 +83,7 @@ export const RegistrationScreen = () => {
       .required("Required"),
     email: Yup.string().email("Invalid email").required("Required"),
     password: Yup.string()
-      .min(SYMBBOUNDARY.minPass, "Password min 6 symbols long")
+      .min(SYMBBOUNDARY.minPass, "Min 6 char's")
       .max(SYMBBOUNDARY.max, "Password too Long!")
       .required("Required"),
   });
@@ -212,7 +212,10 @@ export const RegistrationScreen = () => {
                       <SubmitBtnText>Sign up</SubmitBtnText>
                     </SubmitBtn>
                     <TouchOpWrapper
-                      onPress={() => navigation.navigate("LoginScreen")}
+                      onPress={() => {
+                        setShowPass(false);
+                        navigation.navigate("LoginScreen");
+                      }}
                     >
                       <LinkText>Already registered? Please login</LinkText>
                     </TouchOpWrapper>
@@ -329,7 +332,7 @@ const LinkText = styled.Text`
 `;
 const ErrorMessage = styled.Text`
   position: absolute;
-  top: 30px;
+  top: 43%;
   right: 16px;
   color: #f02c2c85;
   font-family: "Roboto-Regular";

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
 import {
   View,
@@ -31,7 +31,7 @@ export const CreatePostsScreen = () => {
   const [isCamPermission, setIsCamPermission] = useState(null);
   const [isMediaPermission, setIsMediaPermission] = useState(null);
   const [isLocationPermission, setIsLocationPermission] = useState(null);
-  const [camRef, setCamRef] = useState(null);
+  const cameraRef = useRef(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [photoUri, setPhotoUri] = useState(null);
 
@@ -72,8 +72,8 @@ export const CreatePostsScreen = () => {
   }, []);
 
   const takePicture = async () => {
-    if (camRef) {
-      const { uri } = await camRef.takePictureAsync();
+    if (cameraRef.current) {
+      const { uri } = await cameraRef.current.takePictureAsync();
       setPhotoUri(uri);
       await MediaLibrary.createAssetAsync(uri);
       setIsDisableButtons(false);
@@ -137,11 +137,11 @@ export const CreatePostsScreen = () => {
     })();
   };
 
+  const isFocused = useIsFocused();
+
   if (isCamPermission === null) {
     return <Loader />;
-  }
-
-  if (!isCamPermission || !isMediaPermission || !isLocationPermission) {
+  } else if (!isCamPermission || !isMediaPermission || !isLocationPermission) {
     return (
       <PendingContainer>
         <Text
@@ -164,10 +164,11 @@ export const CreatePostsScreen = () => {
       >
         <MainView>
           <PhotoWrapper>
-            {!photoUri ? (
+            {!photoUri && isFocused ? (
               <Camera
                 type={type}
-                ref={setCamRef}
+                ref={cameraRef}
+                ratio={"1:1"}
                 style={{
                   width: "100%",
                   height: "100%",

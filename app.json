@@ -22,10 +22,20 @@
         "softwareKeyboardLayoutMode": "pan",
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.heorhiihoncharov.ReactNativeProject",
+      "config": {
+        "googleMaps": {
+          "ApiKey": "AIzaSyBvomRUvIun-kvPxVLBYdSNfZXkp-4r_gU"
+      }}
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "72f81ca9-6ed5-4bc8-b64b-9965a428dec7"
+      }
     }
   }
 }

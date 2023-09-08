@@ -1,4 +1,3 @@
-import React from "react";
 import { Dimensions } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import styled from "styled-components/native";

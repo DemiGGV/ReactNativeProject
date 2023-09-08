@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { Alert, Keyboard, TouchableWithoutFeedback } from "react-native";
@@ -172,7 +172,6 @@ export const ProfileScreen = () => {
 
 const ContainerViewMain = styled.View`
   margin-top: 120px;
-  /* margin-bottom: 120px; */
 `;
 const ProfileView = styled.View`
   height: 100%;

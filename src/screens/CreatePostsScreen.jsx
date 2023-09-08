@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import { useNavigation } from "@react-navigation/native";
@@ -13,7 +14,8 @@ import {
 import styled from "styled-components/native";
 import { Formik } from "formik";
 import { Feather } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux";
+import Toast from "react-native-root-toast";
+
 import { addPost } from "../redux/posts/postsOperations";
 import { getUser } from "../redux/user/authSelectors";
 import { uploadImage } from "../helpers/uploadImage";
@@ -83,7 +85,17 @@ export const CreatePostsScreen = () => {
       setIsDisableButtons(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        console.log("Permission to access location was denied");
+        let toast = Toast.show("Permission to access location was denied", {
+          duration: 1000,
+          backgroundColor: "#f02c2c",
+          shadowColor: "black",
+          position: Toast.positions.CENTER,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+
         return;
       }
       const location = await Location.getCurrentPositionAsync({});
@@ -121,7 +133,6 @@ export const CreatePostsScreen = () => {
           hideOnPress: true,
           delay: 0,
         });
-        console.log("Can't send!");
       }
     })();
   };
@@ -129,10 +140,19 @@ export const CreatePostsScreen = () => {
   if (isCamPermission === null) {
     return <Loader />;
   }
-  if (!isCamPermission) {
+
+  if (!isCamPermission || !isMediaPermission || !isLocationPermission) {
     return (
       <PendingContainer>
-        <Text>No access to camera.</Text>
+        <Text
+          style={{
+            color: "#f02c2c",
+            fontFamily: "Roboto-Regular",
+            fontSize: 16,
+          }}
+        >
+          No access to camera or storage or location.
+        </Text>
       </PendingContainer>
     );
   }
@@ -218,11 +238,12 @@ export const CreatePostsScreen = () => {
           <DeleteBtn
             onPress={() => {
               setPhotoUri(null);
+              setIsDisableButtons(true);
             }}
             style={[keyboardStatus && { marginTop: 30 }]}
-            disabled={!photoUri}
+            disabled={isDisableButtons}
           >
-            <IconTrash name="trash" size={24} st={photoUri} />
+            <IconTrash name="trash" size={24} st={!isDisableButtons} />
           </DeleteBtn>
         </MainView>
       </ContainerViewMain>

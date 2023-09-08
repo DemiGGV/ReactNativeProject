@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
+import { TouchableWithoutFeedback, Keyboard, View, Text } from "react-native";
 import styled from "styled-components/native";
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
+import * as Yup from "yup";
 import Toast from "react-native-root-toast";
 import md5 from "md5";
 
@@ -18,6 +19,12 @@ const userAvatarURL = (email) => {
 
   const userHashEmail = md5(email.trim().toLowerCase());
   return `${AVATAR_URL}${userHashEmail}?s=${AVATAR_SIZE}${AVATAR_OPTS}`;
+};
+
+const SYMBBOUNDARY = {
+  minName: 3,
+  minPass: 6,
+  max: 30,
 };
 
 export const RegistrationScreen = () => {
@@ -49,8 +56,14 @@ export const RegistrationScreen = () => {
   }, []);
 
   const handleSubmit = async (values, { resetForm }) => {
-    if (!values.displayName) {
-      let toast = Toast.show("Input Your name please", {
+    values.photoURL = userAvatarURL(values.email);
+    try {
+      await dispatch(registerUser(values)).unwrap();
+
+      resetForm();
+      navigation.navigate("HomeScreen");
+    } catch (err) {
+      let toast = Toast.show(err.message, {
         duration: 1000,
         backgroundColor: "#f02c2c",
         shadowColor: "black",
@@ -60,16 +73,20 @@ export const RegistrationScreen = () => {
         hideOnPress: true,
         delay: 0,
       });
-      return;
     }
-    values.photoURL = userAvatarURL(values.email);
-    try {
-      await dispatch(registerUser(values)).unwrap();
-
-      resetForm();
-      navigation.navigate("HomeScreen");
-    } catch (rejectedValueOrSerializedError) {}
   };
+
+  const registrationSchema = Yup.object().shape({
+    displayName: Yup.string()
+      .min(SYMBBOUNDARY.minName, "Name too Short!")
+      .max(SYMBBOUNDARY.max, "Name too Long!")
+      .required("Required"),
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string()
+      .min(SYMBBOUNDARY.minPass, "Password min 6 symbols long")
+      .max(SYMBBOUNDARY.max, "Password too Long!")
+      .required("Required"),
+  });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -104,36 +121,53 @@ export const RegistrationScreen = () => {
               <Formik
                 initialValues={{ displayName: "", email: "", password: "" }}
                 onSubmit={handleSubmit}
+                validationSchema={registrationSchema}
               >
-                {({ handleChange, handleBlur, handleSubmit, values }) => (
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                }) => (
                   <FormWrapper>
-                    <FormField
-                      style={[focused === "displayName" && focusedFieldStyle]}
-                      onFocus={() => {
-                        setFocused("displayName");
-                      }}
-                      onChangeText={handleChange("displayName")}
-                      onBlur={() => {
-                        setFocused("");
-                        handleBlur("displayName");
-                      }}
-                      value={values.displayName}
-                      placeholder="Login"
-                    />
-                    <FormField
-                      style={[focused === "email" && focusedFieldStyle]}
-                      onFocus={() => {
-                        setFocused("email");
-                      }}
-                      onChangeText={handleChange("email")}
-                      onBlur={() => {
-                        setFocused("");
-                        handleBlur("email");
-                      }}
-                      value={values.email}
-                      placeholder="E-mail"
-                      inputMode="email"
-                    />
+                    <View>
+                      <FormField
+                        style={[focused === "displayName" && focusedFieldStyle]}
+                        onFocus={() => {
+                          setFocused("displayName");
+                        }}
+                        onChangeText={handleChange("displayName")}
+                        onBlur={() => {
+                          setFocused("");
+                          handleBlur("displayName");
+                        }}
+                        value={values.displayName}
+                        placeholder="Login Name"
+                      />
+                      {errors.displayName && (
+                        <ErrorMessage>{errors.displayName}</ErrorMessage>
+                      )}
+                    </View>
+                    <View>
+                      <FormField
+                        style={[focused === "email" && focusedFieldStyle]}
+                        onFocus={() => {
+                          setFocused("email");
+                        }}
+                        onChangeText={handleChange("email")}
+                        onBlur={() => {
+                          setFocused("");
+                          handleBlur("email");
+                        }}
+                        value={values.email}
+                        placeholder="E-mail"
+                        inputMode="email"
+                      />
+                      {errors.email && (
+                        <ErrorMessage>{errors.email}</ErrorMessage>
+                      )}
+                    </View>
                     <View>
                       <FormField
                         style={[focused === "password" && focusedFieldStyle]}
@@ -158,6 +192,21 @@ export const RegistrationScreen = () => {
                           {!showPass ? "Show password" : "Hide password"}
                         </PassLinkText>
                       </PasswordLink>
+                      {errors.password && (
+                        <Text
+                          style={{
+                            position: "absolute",
+                            top: 30,
+                            right: 136,
+                            color: "#f02c2c85",
+                            fontFamily: "Roboto-Regular",
+                            fontSize: 16,
+                            top: "43%",
+                          }}
+                        >
+                          {errors.password}
+                        </Text>
+                      )}
                     </View>
                     <SubmitBtn onPress={handleSubmit} title="Submit">
                       <SubmitBtnText>Sign up</SubmitBtnText>
@@ -275,6 +324,14 @@ const LinkText = styled.Text`
   margin-bottom: 40px;
   color: #1b4371;
   text-align: center;
+  font-family: "Roboto-Regular";
+  font-size: 16px;
+`;
+const ErrorMessage = styled.Text`
+  position: absolute;
+  top: 30px;
+  right: 16px;
+  color: #f02c2c85;
   font-family: "Roboto-Regular";
   font-size: 16px;
 `;

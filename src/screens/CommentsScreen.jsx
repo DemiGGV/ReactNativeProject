@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import * as Crypto from "expo-crypto";
-import { Keyboard, TouchableWithoutFeedback } from "react-native";
-import styled from "styled-components/native";
-import { Feather } from "@expo/vector-icons";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import Toast from "react-native-root-toast";
+import * as Crypto from "expo-crypto";
+import styled from "styled-components/native";
 
 import { getUser } from "../redux/user/authSelectors";
 import { editPost } from "../redux/posts/postsOperations";
@@ -11,7 +12,6 @@ import { getCurrentPost, getPosts } from "../redux/posts/postsSelectors";
 
 export const CommentsScreen = () => {
   const [inputValue, setInputValue] = useState("");
-  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const user = useSelector(getUser);
   const posts = useSelector(getPosts);
   const currentPost = useSelector(getCurrentPost);
@@ -89,8 +89,8 @@ export const CommentsScreen = () => {
           <InputForm
             value={inputValue}
             onChangeText={setInputValue}
-            onFocus={() => setIsKeyboardVisible(true)}
-            onBlur={() => setIsKeyboardVisible(false)}
+            onFocus={() => {}}
+            onBlur={() => {}}
             placeholder="Comment..."
           />
           <SendBtn
@@ -98,6 +98,7 @@ export const CommentsScreen = () => {
             style={{
               backgroundColor: !!inputValue ? "#ff6c00" : "#21212180",
             }}
+            disabled={!inputValue}
           >
             <ArrowUp name="arrow-up" size={24} />
           </SendBtn>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableWithoutFeedback } from "react-native";
@@ -25,7 +25,7 @@ export const PostsScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  if (!user) null;
+  if (!user) return <Loader />;
 
   return (
     <MiddleView>

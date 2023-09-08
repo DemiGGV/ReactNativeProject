@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableWithoutFeedback, Keyboard, View } from "react-native";
+import { TouchableWithoutFeedback, Keyboard, View, Text } from "react-native";
 import { Formik } from "formik";
+import * as Yup from "yup";
 import styled from "styled-components/native";
+import Toast from "react-native-root-toast";
 
 import { BackgroundComponent } from "../components/BackgroundComponent";
 import { loginUser } from "../redux/user/authOperations";
+
+const SYMBBOUNDARY = {
+  minName: 3,
+  minPass: 6,
+  max: 30,
+};
 
 export const LoginScreen = () => {
   const navigation = useNavigation();
@@ -40,8 +48,27 @@ export const LoginScreen = () => {
       await dispatch(loginUser(values)).unwrap();
       resetForm();
       navigation.navigate("HomeScreen");
-    } catch (rejectedValueOrSerializedError) {}
+    } catch (err) {
+      let toast = Toast.show(err.message, {
+        duration: 1000,
+        backgroundColor: "#f02c2c",
+        shadowColor: "black",
+        position: Toast.positions.CENTER,
+        shadow: true,
+        animation: true,
+        hideOnPress: true,
+        delay: 0,
+      });
+    }
   };
+
+  const loginSchema = Yup.object().shape({
+    email: Yup.string().email("Invalid email").required("Required"),
+    password: Yup.string()
+      .min(SYMBBOUNDARY.minPass, "Password min 6 symbols long")
+      .max(SYMBBOUNDARY.max, "Password too Long!")
+      .required("Required"),
+  });
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -57,23 +84,35 @@ export const LoginScreen = () => {
               <Formik
                 initialValues={{ email: "", password: "" }}
                 onSubmit={handleSubmit}
+                validationSchema={loginSchema}
               >
-                {({ handleChange, handleBlur, handleSubmit, values }) => (
+                {({
+                  handleChange,
+                  handleBlur,
+                  handleSubmit,
+                  values,
+                  errors,
+                }) => (
                   <FormWrapper>
-                    <FormField
-                      style={[focused === "email" && focusedFieldStyle]}
-                      onFocus={() => {
-                        setFocused("email");
-                      }}
-                      onChangeText={handleChange("email")}
-                      onBlur={() => {
-                        setFocused("");
-                        handleBlur("email");
-                      }}
-                      value={values.email}
-                      placeholder="E-mail"
-                      inputMode="email"
-                    />
+                    <View>
+                      <FormField
+                        style={[focused === "email" && focusedFieldStyle]}
+                        onFocus={() => {
+                          setFocused("email");
+                        }}
+                        onChangeText={handleChange("email")}
+                        onBlur={() => {
+                          setFocused("");
+                          handleBlur("email");
+                        }}
+                        value={values.email}
+                        placeholder="E-mail"
+                        inputMode="email"
+                      />
+                      {errors.email && (
+                        <ErrorMessage>{errors.email}</ErrorMessage>
+                      )}
+                    </View>
                     <View>
                       <FormField
                         style={[focused === "password" && focusedFieldStyle]}
@@ -98,6 +137,21 @@ export const LoginScreen = () => {
                           {!showPass ? "Show password" : "Hide password"}
                         </PassLinkText>
                       </PasswordLink>
+                      {errors.password && (
+                        <Text
+                          style={{
+                            position: "absolute",
+                            top: 30,
+                            right: 136,
+                            color: "#f02c2c85",
+                            fontFamily: "Roboto-Regular",
+                            fontSize: 16,
+                            top: "43%",
+                          }}
+                        >
+                          {errors.password}
+                        </Text>
+                      )}
                     </View>
                     <SubmitBtn onPress={handleSubmit} title="Submit">
                       <SubmitBtnText>Sign in</SubmitBtnText>
@@ -195,6 +249,15 @@ const LinkText = styled.Text`
   margin-bottom: 40px;
   color: #1b4371;
   text-align: center;
+  font-family: "Roboto-Regular";
+  font-size: 16px;
+`;
+
+const ErrorMessage = styled.Text`
+  position: absolute;
+  top: 30px;
+  right: 16px;
+  color: #f02c2c85;
   font-family: "Roboto-Regular";
   font-size: 16px;
 `;

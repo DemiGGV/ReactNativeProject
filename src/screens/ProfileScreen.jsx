@@ -17,7 +17,6 @@ import {
 import { setCurrentID } from "../redux/posts/postsSlice";
 import { LogoutBtn } from "../components/LogoutBtn";
 import { Loader } from "../components/Loader";
-const placeholder = require("../../public/placeholder.jpg");
 
 export const ProfileScreen = () => {
   const navigation = useNavigation();

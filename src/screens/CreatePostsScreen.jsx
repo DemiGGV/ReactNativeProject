@@ -31,6 +31,7 @@ export const CreatePostsScreen = () => {
   const [isCamPermission, setIsCamPermission] = useState(null);
   const [isMediaPermission, setIsMediaPermission] = useState(null);
   const [isLocationPermission, setIsLocationPermission] = useState(null);
+  const [coords, setCoords] = useState({});
   const cameraRef = useRef(null);
   const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back);
   const [flashModeSet, setFlashModeSet] = useState(
@@ -50,13 +51,34 @@ export const CreatePostsScreen = () => {
 
   useEffect(() => {
     (async () => {
-      const cameraPermission = await Camera.requestCameraPermissionsAsync();
-      const mediaPermission = await MediaLibrary.requestPermissionsAsync();
-      const locationPermission =
-        await Location.requestForegroundPermissionsAsync();
-      setIsCamPermission(cameraPermission.status === "granted");
-      setIsMediaPermission(mediaPermission.status === "granted");
-      setIsLocationPermission(locationPermission.status === "granted");
+      try {
+        const cameraPermission = await Camera.requestCameraPermissionsAsync();
+        const mediaPermission = await MediaLibrary.requestPermissionsAsync();
+        const locationPermission =
+          await Location.requestForegroundPermissionsAsync();
+        setIsCamPermission(cameraPermission.status === "granted");
+        setIsMediaPermission(mediaPermission.status === "granted");
+        setIsLocationPermission(locationPermission.status === "granted");
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted")
+          throw new Error("Permission to access location was denied");
+        const location = await Location.getCurrentPositionAsync({});
+        setCoords({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      } catch (err) {
+        let toast = Toast.show(err.message, {
+          duration: 1000,
+          backgroundColor: "#f02c2c",
+          shadowColor: "black",
+          position: Toast.positions.CENTER,
+          shadow: true,
+          animation: true,
+          hideOnPress: true,
+          delay: 0,
+        });
+      }
     })();
   }, []);
 
@@ -89,25 +111,7 @@ export const CreatePostsScreen = () => {
   const publishPhoto = (values, { resetForm }) => {
     (async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          let toast = Toast.show("Permission to access location was denied", {
-            duration: 1000,
-            backgroundColor: "#f02c2c",
-            shadowColor: "black",
-            position: Toast.positions.CENTER,
-            shadow: true,
-            animation: true,
-            hideOnPress: true,
-            delay: 0,
-          });
-          return;
-        }
-        const location = await Location.getCurrentPositionAsync({});
-        const coords = {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        };
+        setIsDisableButtons(true);
         const imageURL = await uploadImage(photoUri);
         if (!imageURL) return;
         const post = {
@@ -122,7 +126,6 @@ export const CreatePostsScreen = () => {
           likes: [],
         };
         await dispatch(addPost(post)).unwrap();
-        setIsDisableButtons(true);
         setPhotoUri(null);
         resetForm();
         navigation.navigate("HomeScreen", { screen: "PostsScreen" });

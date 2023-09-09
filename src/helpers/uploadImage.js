@@ -37,7 +37,7 @@ export const uploadImage = async (uriImage) => {
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
         let toast = Toast.show(`Upload is ${progress}% done`, {
-          duration: 1000,
+          duration: 500,
           backgroundColor: "#40a6ce",
           shadowColor: "black",
           position: Toast.positions.CENTER,
@@ -64,7 +64,7 @@ export const uploadImage = async (uriImage) => {
         const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
         resolve(downloadUrl);
         let toast = Toast.show(`Uploaded with URL: ${downloadUrl}`, {
-          duration: 500,
+          duration: 1000,
           backgroundColor: "#40a6ce",
           shadowColor: "black",
           position: Toast.positions.CENTER,

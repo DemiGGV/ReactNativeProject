@@ -46,8 +46,8 @@ const handleEditPost = (state, action) => {
 };
 const handleIncrementLikesPost = (state, action) => {
   state.isLoading = false;
-  const index = state.posts.findIndex((Post) => Post.id === action.payload);
-  state.posts[index].likes++;
+  const index = state.posts.findIndex((Post) => Post.id === action.payload.id);
+  state.posts[index].likes.push(action.payload.uid);
 };
 const handleDelete = (state, action) => {
   state.isLoading = false;

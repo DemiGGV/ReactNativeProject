@@ -94,7 +94,7 @@ export const ProfileScreen = () => {
                   <PostView>
                     <DeletePress onPress={handleDelete}>
                       <PostImage
-                        defaultSource={{ placeholder }}
+                        loadingIndicatorSource={<Loader />}
                         source={{ uri: post.imageUri }}
                         resizeMode="cover"
                       />
@@ -128,23 +128,30 @@ export const ProfileScreen = () => {
                       </DataView>
 
                       <DataView
+                        disabled={post.likes.includes(user.uid)}
                         onPress={() => {
-                          dispatch(incrementLikes({ id: post.id }));
+                          dispatch(
+                            incrementLikes({ id: post.id, uid: user.uid })
+                          );
                         }}
                       >
                         <Icon
                           name="thumbs-up"
                           size={24}
                           style={{
-                            color: post.likes ? "#ff6c00" : "#21212180",
+                            color: !!post.likes.length
+                              ? "#ff6c00"
+                              : "#21212180",
                           }}
                         />
                         <CommentsText
                           style={{
-                            color: post.likes ? "#212121" : "#21212180",
+                            color: !!post.likes.length
+                              ? "#212121"
+                              : "#21212180",
                           }}
                         >
-                          {post.likes}
+                          {post.likes.length}
                         </CommentsText>
                       </DataView>
 
@@ -239,6 +246,7 @@ const PostImage = styled.Image`
   margin-right: auto;
   width: 343px;
   height: 240px;
+  background-color: #00000020;
   border-radius: 8px;
 `;
 const PostTitle = styled.Text`
@@ -273,124 +281,3 @@ const LocationText = styled.Text`
   color: #212121;
   text-decoration: underline;
 `;
-
-// <UserPostsList
-//   data={posts}
-//   keyExtractor={(item) => item.id}
-//   renderItem={({ item }) => (
-//     <PostView key={item.id}>
-//       <PostImage source={item.imageUri} resizeMode="cover" />
-//       <PostTitle>{item.title}</PostTitle>
-//       <PostData>
-//         <CommentsView
-//           onPress={() => {
-//             navigation.navigate("CommentsScreen", {
-//               imageUri: item.imageUri,
-//               comments: item.comments,
-//             });
-//           }}
-//         >
-//           <Icon
-//             name="message-circle"
-//             size={24}
-//             style={{
-//               color: item.comments ? "#ff6c00" : "#21212180",
-//             }}
-//           />
-//           <CountersText
-//             style={{
-//               color: item.comments ? "#212121" : "#21212180",
-//             }}
-//           >
-//             {item.comments.length}
-//           </CountersText>
-//         </CommentsView>
-//         <LikesView>
-//           <Icon
-//             name="thumbs-up"
-//             size={24}
-//             style={{
-//               color: item.likes ? "#ff6c00" : "#21212180",
-//             }}
-//           />
-//           <CountersText
-//             style={{
-//               color: item.likes ? "#212121" : "#21212180",
-//             }}
-//           >
-//             {item.likes}
-//           </CountersText>
-//         </LikesView>
-//         <LocationView
-//           onPress={() => {
-//             navigation.navigate("MapScreen", {
-//               coordinates: item.location.coordinates,
-//             });
-//           }}
-//           style={{ color: "#21212180" }}
-//         >
-//           <Icon name="map-pin" size={24} />
-//           <LocationText>{item.location.name}</LocationText>
-//         </LocationView>
-//       </PostData>
-//     </PostView>
-//   )}
-// />
-
-// const Icon = styled(Feather)`
-//   color: #21212180;
-// `;
-
-// const UserPostsList = styled.FlatList`
-//   width: 100%;
-//   height: auto;
-// `;
-// const PostView = styled.View`
-//   margin-bottom: 32px;
-// `;
-// const PostImage = styled.Image`
-//   width: 100%;
-//   border-radius: 8px;
-// `;
-// const PostTitle = styled.Text`
-//   margin-top: 8px;
-//   color: #212121;
-//   font-family: "Roboto-Medium";
-//   font-weight: bold;
-//   font-size: 16px;
-// `;
-// const PostData = styled.View`
-//   margin-top: 8px;
-//   flex-direction: row;
-//   justify-content: space-between;
-// `;
-// const CommentsView = styled.TouchableOpacity`
-//   flex-direction: row;
-// `;
-// const LikesView = styled.TouchableOpacity`
-//   margin-left: 24px;
-//   flex-direction: row;
-//   align-content: baseline;
-// `;
-// const CountersText = styled.Text`
-//   margin-left: 6px;
-//   margin-top: 2px;
-//   font-family: "Roboto-Regular";
-//   font-size: 16px;
-// `;
-// const LocationView = styled.TouchableOpacity`
-//   margin-left: auto;
-//   flex-direction: row;
-// `;
-// const LocationText = styled.Text`
-//   margin-left: 6px;
-//   margin-top: 2px;
-//   font-family: "Roboto-Regular";
-//   font-size: 16px;
-//   color: #212121;
-//   text-decoration: underline;
-// `;
-
-// // const Icon = styled(Feather)`
-// //   color: #21212180;
-// // `;

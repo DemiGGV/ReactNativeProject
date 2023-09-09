@@ -45,8 +45,8 @@ export const editPost = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       const { id, comment } = credentials;
-      const commentsRef = doc(db, "posts", id);
-      await updateDoc(commentsRef, {
+      const postRef = doc(db, "posts", id);
+      await updateDoc(postRef, {
         comments: arrayUnion(comment),
       });
       return { id, comment };
@@ -55,17 +55,16 @@ export const editPost = createAsyncThunk(
     }
   }
 );
-
 export const incrementLikes = createAsyncThunk(
   "posts/incrementLikes",
   async (credentials, thunkAPI) => {
     try {
-      const { id } = credentials;
-      const commentsRef = doc(db, "posts", id);
-      await updateDoc(commentsRef, {
-        likes: increment(1),
+      const { id, uid } = credentials;
+      const postRef = doc(db, "posts", id);
+      await updateDoc(postRef, {
+        likes: arrayUnion(uid),
       });
-      return id;
+      return { id, uid };
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
     }

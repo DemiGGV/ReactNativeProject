@@ -32,7 +32,10 @@ export const CreatePostsScreen = () => {
   const [isMediaPermission, setIsMediaPermission] = useState(null);
   const [isLocationPermission, setIsLocationPermission] = useState(null);
   const cameraRef = useRef(null);
-  const [type, setType] = useState(Camera.Constants.Type.back);
+  const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back);
+  const [flashModeSet, setFlashModeSet] = useState(
+    Camera.Constants.FlashMode.auto
+  );
   const [photoUri, setPhotoUri] = useState(null);
 
   const focusedFieldStyle = {
@@ -73,7 +76,10 @@ export const CreatePostsScreen = () => {
 
   const takePicture = async () => {
     if (cameraRef.current) {
-      const { uri } = await cameraRef.current.takePictureAsync();
+      const { uri } = await cameraRef.current.takePictureAsync({
+        quality: 0.5,
+        skipProcessing: true,
+      });
       setPhotoUri(uri);
       await MediaLibrary.createAssetAsync(uri);
       setIsDisableButtons(false);
@@ -82,28 +88,26 @@ export const CreatePostsScreen = () => {
 
   const publishPhoto = (values, { resetForm }) => {
     (async () => {
-      setIsDisableButtons(true);
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        let toast = Toast.show("Permission to access location was denied", {
-          duration: 1000,
-          backgroundColor: "#f02c2c",
-          shadowColor: "black",
-          position: Toast.positions.CENTER,
-          shadow: true,
-          animation: true,
-          hideOnPress: true,
-          delay: 0,
-        });
-
-        return;
-      }
-      const location = await Location.getCurrentPositionAsync({});
-      const coords = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      };
       try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          let toast = Toast.show("Permission to access location was denied", {
+            duration: 1000,
+            backgroundColor: "#f02c2c",
+            shadowColor: "black",
+            position: Toast.positions.CENTER,
+            shadow: true,
+            animation: true,
+            hideOnPress: true,
+            delay: 0,
+          });
+          return;
+        }
+        const location = await Location.getCurrentPositionAsync({});
+        const coords = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        };
         const imageURL = await uploadImage(photoUri);
         if (!imageURL) return;
         const post = {
@@ -115,9 +119,10 @@ export const CreatePostsScreen = () => {
             coordinates: coords,
           },
           comments: [],
-          likes: 0,
+          likes: [],
         };
         await dispatch(addPost(post)).unwrap();
+        setIsDisableButtons(true);
         setPhotoUri(null);
         resetForm();
         navigation.navigate("HomeScreen", { screen: "PostsScreen" });
@@ -148,7 +153,7 @@ export const CreatePostsScreen = () => {
           style={{
             color: "#f02c2c",
             fontFamily: "Roboto-Regular",
-            fontSize: 16,
+            fontSize: 20,
           }}
         >
           No access to camera or storage or location.
@@ -166,20 +171,38 @@ export const CreatePostsScreen = () => {
           <PhotoWrapper>
             {!photoUri && isFocused ? (
               <Camera
-                type={type}
+                type={typeCamera}
+                flashMode={flashModeSet}
                 ref={cameraRef}
-                ratio={"1:1"}
+                ratio={"4:3"}
                 style={{
-                  width: "100%",
-                  height: "100%",
+                  width: 360,
+                  height: 480,
                 }}
               />
             ) : (
               <Photo source={{ uri: photoUri }} />
             )}
-            <PhotoBtn onPress={takePicture} st={photoUri}>
+            <PhotoBtn
+              onPress={takePicture}
+              st={photoUri}
+              disabled={!isDisableButtons}
+            >
               <IconCam name="camera" size={24} st={photoUri} />
             </PhotoBtn>
+            <TypeBtn
+              onPress={() =>
+                setTypeCamera(
+                  typeCamera === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
+                    : Camera.Constants.Type.back
+                )
+              }
+              st={photoUri}
+              disabled={!isDisableButtons}
+            >
+              <IconCam name="refresh-cw" size={24} st={photoUri} />
+            </TypeBtn>
           </PhotoWrapper>
           {!photoUri ? (
             <TextSig>Make a photo</TextSig>
@@ -295,7 +318,18 @@ const PhotoBtn = styled.TouchableOpacity`
   width: 60px;
   height: 60px;
   border-radius: 30px;
-  background-color: ${(props) => (props.st ? "#ffffff30" : "#fff")};
+  background-color: ${(props) => (props.st ? "#00000020" : "#ffffff50")};
+`;
+const TypeBtn = styled.TouchableOpacity`
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 30px;
+  background-color: #ffffff30;
 `;
 const IconCam = styled(Feather)`
   color: ${(props) => (props.st ? "#fff" : "#bdbdbd")};

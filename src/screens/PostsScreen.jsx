@@ -31,7 +31,11 @@ export const PostsScreen = () => {
   return (
     <MiddleView>
       <UserView>
-        <AvatarImage source={{ uri: user?.photoURL }} resizeMode="cover" />
+        <AvatarImage
+          loadingIndicatorSource={<Loader />}
+          source={{ uri: user?.photoURL }}
+          resizeMode="cover"
+        />
         <UserDataView>
           <UserNameText>{user?.displayName}</UserNameText>
           <UserEmailText>{user?.email}</UserEmailText>
@@ -45,7 +49,7 @@ export const PostsScreen = () => {
             <TouchableWithoutFeedback key={post.id} onPress={() => {}}>
               <PostView>
                 <PostImage
-                  defaultSource={{ placeholder }}
+                  loadingIndicatorSource={<Loader />}
                   source={{ uri: post.imageUri }}
                   resizeMode="cover"
                 />
@@ -74,23 +78,24 @@ export const PostsScreen = () => {
                   </DataView>
 
                   <DataView
+                    disabled={post.likes.includes(user.uid)}
                     onPress={() => {
-                      dispatch(incrementLikes({ id: post.id }));
+                      dispatch(incrementLikes({ id: post.id, uid: user.uid }));
                     }}
                   >
                     <Icon
                       name="thumbs-up"
                       size={24}
                       style={{
-                        color: post.likes ? "#ff6c00" : "#21212180",
+                        color: !!post.likes.length ? "#ff6c00" : "#21212180",
                       }}
                     />
                     <CommentsText
                       style={{
-                        color: post.likes ? "#212121" : "#21212180",
+                        color: !!post.likes.length ? "#212121" : "#21212180",
                       }}
                     >
-                      {post.likes}
+                      {post.likes.length}
                     </CommentsText>
                   </DataView>
 
@@ -164,6 +169,7 @@ const PostImage = styled.Image`
   margin-right: auto;
   width: 343px;
   height: 240px;
+  background-color: #00000020;
   border-radius: 8px;
 `;
 const PostTitle = styled.Text`

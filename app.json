@@ -13,20 +13,17 @@
     },
     "assetBundlePatterns": [
       "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
+    ],    
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.heorhiihoncharov.ReactNativeProject",
       "config": {
         "googleMaps": {
-          "ApiKey": "AIzaSyBvomRUvIun-kvPxVLBYdSNfZXkp-4r_gU"
-      }}
+          "apiKey": "AIzaSyBvomRUvIun-kvPxVLBYdSNfZXkp-4r_gU"
+      }},
+      "package": "com.heorhiihoncharov.ReactNativeProject"
     },
     "web": {
       "favicon": "./assets/favicon.png"

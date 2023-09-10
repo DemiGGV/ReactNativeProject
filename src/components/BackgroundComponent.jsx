@@ -8,7 +8,10 @@ const StyledBackground = styled.ImageBackground`
 
 export const BackgroundComponent = ({ children }) => {
   return (
-    <StyledBackground source={require("../imgs/BG.jpg")} resizeMode="cover">
+    <StyledBackground
+      source={require("../../assets/BG.jpg")}
+      resizeMode="cover"
+    >
       {children}
       <StatusBar style="auto" />
     </StyledBackground>

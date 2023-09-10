@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { RootSiblingParent } from "react-native-root-siblings";
+import "react-native-gesture-handler";
 
 import { HomeScreen } from "./src/screens/HomeScreen";
 import { RegistrationScreen } from "./src/screens/RegistrationScreen";

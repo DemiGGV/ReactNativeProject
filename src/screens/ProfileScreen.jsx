@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { Alert, Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Alert, Keyboard, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import styled from "styled-components/native";
 
@@ -62,7 +62,7 @@ export const ProfileScreen = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss}>
       <BackgroundComponent>
         <ContainerViewMain>
           <ProfileView>
@@ -89,7 +89,7 @@ export const ProfileScreen = () => {
             <TitleH1>{user?.displayName}</TitleH1>
             <UserPostsList>
               {posts?.map((post) => (
-                <TouchableWithoutFeedback key={post.id} onPress={() => {}}>
+                <Pressable style={{ flex: 1 }} key={post.id} onPress={() => {}}>
                   <PostView>
                     <DeletePress onPress={handleDelete}>
                       <PostImage
@@ -167,13 +167,13 @@ export const ProfileScreen = () => {
                       </LocationView>
                     </PostData>
                   </PostView>
-                </TouchableWithoutFeedback>
+                </Pressable>
               ))}
             </UserPostsList>
           </ProfileView>
         </ContainerViewMain>
       </BackgroundComponent>
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Keyboard, TouchableWithoutFeedback } from "react-native";
+import { Keyboard, Pressable, TouchableWithoutFeedback } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Toast from "react-native-root-toast";
 import * as Crypto from "expo-crypto";
@@ -58,8 +58,11 @@ export const CommentsScreen = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ContainerViewMain>
+    <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+      <ContainerViewMain
+        keyboardVerticalOffset={20}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <Photo
           source={{ uri: posts[currentPost].imageUri }}
           resizeMode="cover"
@@ -69,7 +72,7 @@ export const CommentsScreen = () => {
           renderItem={({ item }) => {
             const oddElement = item.uid === user.uid;
             return (
-              <TouchableWithoutFeedback onPress={() => {}}>
+              <Pressable onPress={() => {}} style={{ flex: 1 }}>
                 <MessageView st={oddElement}>
                   <AvatarImage
                     source={{ uri: item.photoURL }}
@@ -80,7 +83,7 @@ export const CommentsScreen = () => {
                     <TimeText st={oddElement}>{item.timeStamp}</TimeText>
                   </CommentView>
                 </MessageView>
-              </TouchableWithoutFeedback>
+              </Pressable>
             );
           }}
           keyExtractor={(item) => item.id}
@@ -104,11 +107,11 @@ export const CommentsScreen = () => {
           </SendBtn>
         </FormWrapper>
       </ContainerViewMain>
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 };
 
-const ContainerViewMain = styled.View`
+const ContainerViewMain = styled.KeyboardAvoidingView`
   flex: 1;
   justify-content: flex-end;
   align-items: center;
@@ -124,6 +127,7 @@ const Photo = styled.Image`
   margin-bottom: 32px;
 `;
 const ChatScroll = styled.FlatList`
+  max-height: 300px;
   margin-bottom: 20px;
 `;
 const MessageView = styled.View`

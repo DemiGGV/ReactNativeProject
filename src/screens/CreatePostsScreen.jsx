@@ -4,13 +4,7 @@ import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import * as Location from "expo-location";
-import {
-  View,
-  Text,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Platform,
-} from "react-native";
+import { View, Text, Keyboard, Platform, Pressable } from "react-native";
 import styled from "styled-components/native";
 import { Formik } from "formik";
 import { Feather } from "@expo/vector-icons";
@@ -166,7 +160,7 @@ export const CreatePostsScreen = () => {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss}>
       <ContainerViewMain
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
@@ -274,7 +268,7 @@ export const CreatePostsScreen = () => {
           </DeleteBtn>
         </MainView>
       </ContainerViewMain>
-    </TouchableWithoutFeedback>
+    </Pressable>
   );
 };
 
@@ -285,11 +279,12 @@ const PendingContainer = styled.View`
 `;
 const ContainerViewMain = styled.KeyboardAvoidingView`
   flex: 1;
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
   align-items: center;
   background-color: #fff;
 `;
 const MainView = styled.View`
+  margin-top: 10px;
   width: 100%;
   height: auto;
   padding: 0 16px;

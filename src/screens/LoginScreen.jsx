@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableWithoutFeedback, Keyboard, View, Text } from "react-native";
+import { Keyboard, View, Text, Pressable } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import styled from "styled-components/native";
@@ -71,107 +71,99 @@ export const LoginScreen = () => {
   });
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ flex: 1 }}>
-        <BackgroundComponent>
-          <ContainerViewMain
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+      <BackgroundComponent>
+        <ContainerViewMain
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <RegFormView
+            style={keyboardStatus ? { height: 490 } : { height: 490 }}
           >
-            <RegFormView
-              style={keyboardStatus ? { height: 260 } : { height: 490 }}
+            <TitleH1>Autorization</TitleH1>
+            <Formik
+              initialValues={{ email: "", password: "" }}
+              onSubmit={handleSubmit}
+              validationSchema={loginSchema}
             >
-              <TitleH1>Autorization</TitleH1>
-              <Formik
-                initialValues={{ email: "", password: "" }}
-                onSubmit={handleSubmit}
-                validationSchema={loginSchema}
-              >
-                {({
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                }) => (
-                  <FormWrapper>
-                    <View>
-                      <FormField
-                        style={[focused === "email" && focusedFieldStyle]}
-                        onFocus={() => {
-                          setFocused("email");
-                        }}
-                        onChangeText={handleChange("email")}
-                        onBlur={() => {
-                          setFocused("");
-                          handleBlur("email");
-                        }}
-                        value={values.email}
-                        placeholder="E-mail"
-                        inputMode="email"
-                      />
-                      {errors.email && (
-                        <ErrorMessage>{errors.email}</ErrorMessage>
-                      )}
-                    </View>
-                    <View>
-                      <FormField
-                        style={[focused === "password" && focusedFieldStyle]}
-                        onFocus={() => {
-                          setFocused("password");
-                        }}
-                        onChangeText={handleChange("password")}
-                        onBlur={() => {
-                          setFocused("");
-                          handleBlur("password");
-                        }}
-                        value={values.password}
-                        placeholder="Password"
-                        secureTextEntry={!showPass}
-                      />
-                      <PasswordLink
-                        onPress={() => {
-                          setShowPass(!showPass);
-                        }}
-                      >
-                        <PassLinkText>
-                          {!showPass ? "Show password" : "Hide password"}
-                        </PassLinkText>
-                      </PasswordLink>
-                      {errors.password && (
-                        <Text
-                          style={{
-                            position: "absolute",
-                            top: 30,
-                            right: 136,
-                            color: "#f02c2c85",
-                            fontFamily: "Roboto-Regular",
-                            fontSize: 16,
-                            top: "43%",
-                          }}
-                        >
-                          {errors.password}
-                        </Text>
-                      )}
-                    </View>
-                    <SubmitBtn onPress={handleSubmit} title="Submit">
-                      <SubmitBtnText>Sign in</SubmitBtnText>
-                    </SubmitBtn>
-                    <TouchOpWrapper
+              {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+                <FormWrapper>
+                  <View>
+                    <FormField
+                      style={[focused === "email" && focusedFieldStyle]}
+                      onFocus={() => {
+                        setFocused("email");
+                      }}
+                      onChangeText={handleChange("email")}
+                      onBlur={() => {
+                        setFocused("");
+                        handleBlur("email");
+                      }}
+                      value={values.email}
+                      placeholder="E-mail"
+                      inputMode="email"
+                    />
+                    {errors.email && (
+                      <ErrorMessage>{errors.email}</ErrorMessage>
+                    )}
+                  </View>
+                  <View>
+                    <FormField
+                      style={[focused === "password" && focusedFieldStyle]}
+                      onFocus={() => {
+                        setFocused("password");
+                      }}
+                      onChangeText={handleChange("password")}
+                      onBlur={() => {
+                        setFocused("");
+                        handleBlur("password");
+                      }}
+                      value={values.password}
+                      placeholder="Password"
+                      secureTextEntry={!showPass}
+                    />
+                    <PasswordLink
                       onPress={() => {
-                        setShowPass(false);
-                        navigation.navigate("RegistrationScreen");
+                        setShowPass(!showPass);
                       }}
                     >
-                      <LinkText>Dont have account? Please register</LinkText>
-                    </TouchOpWrapper>
-                  </FormWrapper>
-                )}
-              </Formik>
-            </RegFormView>
-          </ContainerViewMain>
-        </BackgroundComponent>
-      </View>
-    </TouchableWithoutFeedback>
+                      <PassLinkText>
+                        {!showPass ? "Show password" : "Hide password"}
+                      </PassLinkText>
+                    </PasswordLink>
+                    {errors.password && (
+                      <Text
+                        style={{
+                          position: "absolute",
+                          top: 30,
+                          right: 136,
+                          color: "#f02c2c85",
+                          fontFamily: "Roboto-Regular",
+                          fontSize: 16,
+                          top: "43%",
+                        }}
+                      >
+                        {errors.password}
+                      </Text>
+                    )}
+                  </View>
+                  <SubmitBtn onPress={handleSubmit} title="Submit">
+                    <SubmitBtnText>Sign in</SubmitBtnText>
+                  </SubmitBtn>
+                  <TouchOpWrapper
+                    onPress={() => {
+                      setShowPass(false);
+                      navigation.navigate("RegistrationScreen");
+                    }}
+                  >
+                    <LinkText>Dont have account? Please register</LinkText>
+                  </TouchOpWrapper>
+                </FormWrapper>
+              )}
+            </Formik>
+          </RegFormView>
+        </ContainerViewMain>
+      </BackgroundComponent>
+    </Pressable>
   );
 };
 

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableWithoutFeedback } from "react-native";
+import { Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import styled from "styled-components/native";
 
@@ -45,7 +45,7 @@ export const PostsScreen = () => {
       ) : (
         <UserPostsList>
           {posts?.map((post) => (
-            <TouchableWithoutFeedback key={post.id} onPress={() => {}}>
+            <Pressable style={{ flex: 1 }} key={post.id} onPress={() => {}}>
               <PostView>
                 <PostImage
                   loadingIndicatorSource={<Loader />}
@@ -111,7 +111,7 @@ export const PostsScreen = () => {
                   </LocationView>
                 </PostData>
               </PostView>
-            </TouchableWithoutFeedback>
+            </Pressable>
           ))}
         </UserPostsList>
       )}

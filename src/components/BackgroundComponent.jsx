@@ -12,8 +12,8 @@ export const BackgroundComponent = ({ children }) => {
       source={require("../../assets/BG.jpg")}
       resizeMode="cover"
     >
-      {children}
       <StatusBar style="auto" />
+      {children}
     </StyledBackground>
   );
 };

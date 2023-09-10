@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-import { TouchableWithoutFeedback, Keyboard, View, Text } from "react-native";
+import { Keyboard, View, Text, Pressable } from "react-native";
 import styled from "styled-components/native";
 import { Feather } from "@expo/vector-icons";
 import { Formik } from "formik";
@@ -89,151 +89,143 @@ export const RegistrationScreen = () => {
   });
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={{ flex: 1 }}>
-        <BackgroundComponent>
-          <ContainerViewMain
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
+      <BackgroundComponent>
+        <ContainerViewMain
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <RegFormView
+            style={keyboardStatus ? { height: 610 } : { height: 550 }}
           >
-            <RegFormView
-              style={keyboardStatus ? { height: 380 } : { height: 550 }}
+            <AvatarView
+              onPress={() => {
+                setIsAvatarSet(!isAvatarSet);
+              }}
             >
-              <AvatarView
+              {isAvatarSet && (
+                <AvatarImage source={userAvatar} resizeMode="cover" />
+              )}
+              <TouchableOpacityIcon
                 onPress={() => {
                   setIsAvatarSet(!isAvatarSet);
                 }}
               >
-                {isAvatarSet && (
-                  <AvatarImage source={userAvatar} resizeMode="cover" />
-                )}
-                <TouchableOpacityIcon
-                  onPress={() => {
-                    setIsAvatarSet(!isAvatarSet);
-                  }}
-                >
-                  <Icon
-                    name={!isAvatarSet ? "plus-circle" : "x-circle"}
-                    size={26}
-                  />
-                </TouchableOpacityIcon>
-              </AvatarView>
-              <TitleH1>Registration</TitleH1>
-              <Formik
-                initialValues={{ displayName: "", email: "", password: "" }}
-                onSubmit={handleSubmit}
-                validationSchema={registrationSchema}
-              >
-                {({
-                  handleChange,
-                  handleBlur,
-                  handleSubmit,
-                  values,
-                  errors,
-                }) => (
-                  <FormWrapper>
-                    <View>
-                      <FormField
-                        style={[focused === "displayName" && focusedFieldStyle]}
-                        onFocus={() => {
-                          setFocused("displayName");
-                        }}
-                        onChangeText={handleChange("displayName")}
-                        onBlur={() => {
-                          setFocused("");
-                          handleBlur("displayName");
-                        }}
-                        value={values.displayName}
-                        placeholder="Login Name"
-                      />
-                      {errors.displayName && (
-                        <ErrorMessage>{errors.displayName}</ErrorMessage>
-                      )}
-                    </View>
-                    <View>
-                      <FormField
-                        style={[focused === "email" && focusedFieldStyle]}
-                        onFocus={() => {
-                          setFocused("email");
-                        }}
-                        onChangeText={handleChange("email")}
-                        onBlur={() => {
-                          setFocused("");
-                          handleBlur("email");
-                        }}
-                        value={values.email}
-                        placeholder="E-mail"
-                        inputMode="email"
-                      />
-                      {errors.email && (
-                        <ErrorMessage>{errors.email}</ErrorMessage>
-                      )}
-                    </View>
-                    <View>
-                      <FormField
-                        style={[focused === "password" && focusedFieldStyle]}
-                        onFocus={() => {
-                          setFocused("password");
-                        }}
-                        onChangeText={handleChange("password")}
-                        onBlur={() => {
-                          setFocused("");
-                          handleBlur("password");
-                        }}
-                        value={values.password}
-                        placeholder="Password"
-                        secureTextEntry={!showPass}
-                      />
-                      <PasswordLink
-                        onPress={() => {
-                          setShowPass(!showPass);
-                        }}
-                      >
-                        <PassLinkText>
-                          {!showPass ? "Show password" : "Hide password"}
-                        </PassLinkText>
-                      </PasswordLink>
-                      {errors.password && (
-                        <Text
-                          style={{
-                            position: "absolute",
-                            top: 30,
-                            right: 136,
-                            color: "#f02c2c85",
-                            fontFamily: "Roboto-Regular",
-                            fontSize: 16,
-                            top: "43%",
-                          }}
-                        >
-                          {errors.password}
-                        </Text>
-                      )}
-                    </View>
-                    <SubmitBtn onPress={handleSubmit} title="Submit">
-                      <SubmitBtnText>Sign up</SubmitBtnText>
-                    </SubmitBtn>
-                    <TouchOpWrapper
+                <Icon
+                  name={!isAvatarSet ? "plus-circle" : "x-circle"}
+                  size={26}
+                />
+              </TouchableOpacityIcon>
+            </AvatarView>
+            <TitleH1>Registration</TitleH1>
+            <Formik
+              initialValues={{ displayName: "", email: "", password: "" }}
+              onSubmit={handleSubmit}
+              validationSchema={registrationSchema}
+            >
+              {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+                <FormWrapper>
+                  <View>
+                    <FormField
+                      style={[focused === "displayName" && focusedFieldStyle]}
+                      onFocus={() => {
+                        setFocused("displayName");
+                      }}
+                      onChangeText={handleChange("displayName")}
+                      onBlur={() => {
+                        setFocused("");
+                        handleBlur("displayName");
+                      }}
+                      value={values.displayName}
+                      placeholder="Login Name"
+                    />
+                    {errors.displayName && (
+                      <ErrorMessage>{errors.displayName}</ErrorMessage>
+                    )}
+                  </View>
+                  <View>
+                    <FormField
+                      style={[focused === "email" && focusedFieldStyle]}
+                      onFocus={() => {
+                        setFocused("email");
+                      }}
+                      onChangeText={handleChange("email")}
+                      onBlur={() => {
+                        setFocused("");
+                        handleBlur("email");
+                      }}
+                      value={values.email}
+                      placeholder="E-mail"
+                      inputMode="email"
+                    />
+                    {errors.email && (
+                      <ErrorMessage>{errors.email}</ErrorMessage>
+                    )}
+                  </View>
+                  <View>
+                    <FormField
+                      style={[focused === "password" && focusedFieldStyle]}
+                      onFocus={() => {
+                        setFocused("password");
+                      }}
+                      onChangeText={handleChange("password")}
+                      onBlur={() => {
+                        setFocused("");
+                        handleBlur("password");
+                      }}
+                      value={values.password}
+                      placeholder="Password"
+                      secureTextEntry={!showPass}
+                    />
+                    <PasswordLink
                       onPress={() => {
-                        setShowPass(false);
-                        navigation.navigate("LoginScreen");
+                        setShowPass(!showPass);
                       }}
                     >
-                      <LinkText>Already registered? Please login</LinkText>
-                    </TouchOpWrapper>
-                  </FormWrapper>
-                )}
-              </Formik>
-            </RegFormView>
-          </ContainerViewMain>
-        </BackgroundComponent>
-      </View>
-    </TouchableWithoutFeedback>
+                      <PassLinkText>
+                        {!showPass ? "Show password" : "Hide password"}
+                      </PassLinkText>
+                    </PasswordLink>
+                    {errors.password && (
+                      <Text
+                        style={{
+                          position: "absolute",
+                          top: 30,
+                          right: 136,
+                          color: "#f02c2c85",
+                          fontFamily: "Roboto-Regular",
+                          fontSize: 16,
+                          top: "43%",
+                        }}
+                      >
+                        {errors.password}
+                      </Text>
+                    )}
+                  </View>
+                  <SubmitBtn onPress={handleSubmit} title="Submit">
+                    <SubmitBtnText>Sign up</SubmitBtnText>
+                  </SubmitBtn>
+                  <TouchOpWrapper
+                    onPress={() => {
+                      setShowPass(false);
+                      navigation.navigate("LoginScreen");
+                    }}
+                  >
+                    <LinkText>Already registered? Please login</LinkText>
+                  </TouchOpWrapper>
+                </FormWrapper>
+              )}
+            </Formik>
+          </RegFormView>
+        </ContainerViewMain>
+      </BackgroundComponent>
+    </Pressable>
   );
 };
 
 const ContainerViewMain = styled.KeyboardAvoidingView`
   flex: 1;
   flex-direction: column-reverse;
-  justify-content: end;
+  /* justify-content: end; */
 `;
 const RegFormView = styled.View`
   padding: 0 16px 0 16px;

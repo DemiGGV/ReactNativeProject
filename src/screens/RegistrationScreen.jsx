@@ -95,7 +95,7 @@ export const RegistrationScreen = () => {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <RegFormView
-            style={keyboardStatus ? { height: 610 } : { height: 550 }}
+            style={keyboardStatus ? { height: 370 } : { height: 550 }}
           >
             <AvatarView
               onPress={() => {

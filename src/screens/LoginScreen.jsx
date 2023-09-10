@@ -73,11 +73,9 @@ export const LoginScreen = () => {
   return (
     <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
       <BackgroundComponent>
-        <ContainerViewMain
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
+        <ContainerViewMain>
           <RegFormView
-            style={keyboardStatus ? { height: 490 } : { height: 490 }}
+            style={keyboardStatus ? { height: 250 } : { height: 490 }}
           >
             <TitleH1>Autorization</TitleH1>
             <Formik
@@ -167,7 +165,7 @@ export const LoginScreen = () => {
   );
 };
 
-const ContainerViewMain = styled.KeyboardAvoidingView`
+const ContainerViewMain = styled.View`
   flex: 1;
   flex-direction: column-reverse;
   justify-content: end;

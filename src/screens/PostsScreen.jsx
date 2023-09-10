@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable } from "react-native";
@@ -17,6 +17,7 @@ export const PostsScreen = () => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const posts = useSelector(getPosts);
+  const userPostsList = useRef(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(() => {
@@ -40,80 +41,92 @@ export const PostsScreen = () => {
           <UserEmailText>{user?.email}</UserEmailText>
         </UserDataView>
       </UserView>
-      {!posts ? (
+      {!posts.length ? (
         <Loader />
       ) : (
-        <UserPostsList>
-          {posts?.map((post) => (
-            <Pressable style={{ flex: 1 }} key={post.id} onPress={() => {}}>
-              <PostView>
-                <PostImage
-                  loadingIndicatorSource={<Loader />}
-                  source={{ uri: post.imageUri }}
-                  resizeMode="cover"
-                />
-                <PostTitle>{post.title}</PostTitle>
-                <PostData>
-                  <DataView
-                    onPress={() => {
-                      dispatch(setCurrentID(post.id));
-                      navigation.navigate("CommentsScreen");
-                    }}
-                  >
-                    <Icon
-                      name="message-circle"
-                      size={24}
-                      style={{
-                        color: !!post.comments.length ? "#ff6c00" : "#21212180",
-                      }}
-                    />
-                    <CommentsText
-                      style={{
-                        color: !!post.comments.length ? "#212121" : "#21212180",
+        <UserPostsList
+          ref={userPostsList}
+          onContentSizeChange={() => {
+            userPostsList.current?.scrollToEnd();
+          }}
+          data={posts}
+          renderItem={({ item }) => {
+            return (
+              <Pressable style={{ flex: 1 }} onPress={() => {}}>
+                <PostView>
+                  <PostImage
+                    loadingIndicatorSource={<Loader />}
+                    source={{ uri: item.imageUri }}
+                    resizeMode="cover"
+                  />
+                  <PostTitle>{item.title}</PostTitle>
+                  <PostData>
+                    <DataView
+                      onPress={() => {
+                        dispatch(setCurrentID(item.id));
+                        navigation.navigate("CommentsScreen");
                       }}
                     >
-                      {post.comments.length}
-                    </CommentsText>
-                  </DataView>
-
-                  <DataView
-                    disabled={post.likes.includes(user.uid)}
-                    onPress={() => {
-                      dispatch(incrementLikes({ id: post.id, uid: user.uid }));
-                    }}
-                  >
-                    <Icon
-                      name="thumbs-up"
-                      size={24}
-                      style={{
-                        color: !!post.likes.length ? "#ff6c00" : "#21212180",
-                      }}
-                    />
-                    <CommentsText
-                      style={{
-                        color: !!post.likes.length ? "#212121" : "#21212180",
+                      <Icon
+                        name="message-circle"
+                        size={24}
+                        style={{
+                          color: !!item.comments.length
+                            ? "#ff6c00"
+                            : "#21212180",
+                        }}
+                      />
+                      <CommentsText
+                        style={{
+                          color: !!item.comments.length
+                            ? "#212121"
+                            : "#21212180",
+                        }}
+                      >
+                        {item.comments.length}
+                      </CommentsText>
+                    </DataView>
+                    <DataView
+                      disabled={item.likes.includes(user.uid)}
+                      onPress={() => {
+                        dispatch(
+                          incrementLikes({ id: item.id, uid: user.uid })
+                        );
                       }}
                     >
-                      {post.likes.length}
-                    </CommentsText>
-                  </DataView>
-
-                  <LocationView
-                    onPress={() => {
-                      navigation.navigate("MapScreen", {
-                        coordinates: post.location.coordinates,
-                      });
-                    }}
-                    style={{ color: "#21212180" }}
-                  >
-                    <Icon name="map-pin" size={24} />
-                    <LocationText>{post.location.name}</LocationText>
-                  </LocationView>
-                </PostData>
-              </PostView>
-            </Pressable>
-          ))}
-        </UserPostsList>
+                      <Icon
+                        name="thumbs-up"
+                        size={24}
+                        style={{
+                          color: !!item.likes.length ? "#ff6c00" : "#21212180",
+                        }}
+                      />
+                      <CommentsText
+                        style={{
+                          color: !!item.likes.length ? "#212121" : "#21212180",
+                        }}
+                      >
+                        {item.likes.length}
+                      </CommentsText>
+                    </DataView>
+                    <LocationView
+                      onPress={() => {
+                        navigation.navigate("MapScreen", {
+                          coordinates: item.location.coordinates,
+                        });
+                      }}
+                      style={{ color: "#21212180" }}
+                    >
+                      <Icon name="map-pin" size={24} />
+                      <LocationText>{item.location.name}</LocationText>
+                    </LocationView>
+                  </PostData>
+                </PostView>
+              </Pressable>
+            );
+          }}
+          keyExtractor={(item) => item.id}
+        />
       )}
     </MiddleView>
   );
@@ -156,7 +169,7 @@ const UserEmailText = styled.Text`
   font-size: 11px;
 `;
 //+++ posts
-const UserPostsList = styled.ScrollView`
+const UserPostsList = styled.FlatList`
   margin-top: 32px;
   width: 100%;
 `;

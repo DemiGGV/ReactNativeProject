@@ -161,9 +161,7 @@ export const CreatePostsScreen = () => {
 
   return (
     <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss}>
-      <ContainerViewMain
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+      <ContainerViewMain>
         <MainView>
           <PhotoWrapper>
             {!photoUri && isFocused ? (
@@ -277,9 +275,9 @@ const PendingContainer = styled.View`
   align-items: center;
   justify-content: center;
 `;
-const ContainerViewMain = styled.KeyboardAvoidingView`
+const ContainerViewMain = styled.View`
   flex: 1;
-  /* justify-content: flex-end; */
+  justify-content: flex-end;
   align-items: center;
   background-color: #fff;
 `;

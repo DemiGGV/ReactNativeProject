@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Keyboard, Pressable, TouchableWithoutFeedback } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -16,6 +16,7 @@ export const CommentsScreen = () => {
   const posts = useSelector(getPosts);
   const currentPost = useSelector(getCurrentPost);
   const dispatch = useDispatch();
+  const chatScroll = useRef(null);
 
   const formatedTimestamp = () => {
     const options = {
@@ -59,15 +60,16 @@ export const CommentsScreen = () => {
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
-      <ContainerViewMain
-        keyboardVerticalOffset={20}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
+      <ContainerViewMain>
         <Photo
           source={{ uri: posts[currentPost].imageUri }}
           resizeMode="cover"
         />
         <ChatScroll
+          ref={chatScroll}
+          onContentSizeChange={() => {
+            chatScroll.current.scrollToEnd();
+          }}
           data={posts[currentPost].comments}
           renderItem={({ item }) => {
             const oddElement = item.uid === user.uid;
@@ -111,7 +113,7 @@ export const CommentsScreen = () => {
   );
 };
 
-const ContainerViewMain = styled.KeyboardAvoidingView`
+const ContainerViewMain = styled.View`
   flex: 1;
   justify-content: flex-end;
   align-items: center;
@@ -121,8 +123,8 @@ const ContainerViewMain = styled.KeyboardAvoidingView`
 const Photo = styled.Image`
   margin-left: auto;
   margin-right: auto;
-  width: 343px;
-  height: 240px;
+  width: 360px;
+  height: 252px;
   border-radius: 8px;
   margin-bottom: 32px;
 `;

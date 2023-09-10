@@ -169,10 +169,10 @@ export const CreatePostsScreen = () => {
                 type={typeCamera}
                 flashMode={flashModeSet}
                 ref={cameraRef}
-                ratio={"4:3"}
+                ratio={"16:9"}
                 style={{
                   width: 360,
-                  height: 480,
+                  height: 640,
                 }}
               />
             ) : (

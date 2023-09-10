@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Keyboard, Pressable, TouchableWithoutFeedback } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { Keyboard, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import Toast from "react-native-root-toast";
 import * as Crypto from "expo-crypto";
@@ -16,6 +17,7 @@ export const CommentsScreen = () => {
   const posts = useSelector(getPosts);
   const currentPost = useSelector(getCurrentPost);
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const chatScroll = useRef(null);
 
   const formatedTimestamp = () => {
@@ -61,10 +63,21 @@ export const CommentsScreen = () => {
   return (
     <Pressable onPress={Keyboard.dismiss} style={{ flex: 1 }}>
       <ContainerViewMain>
-        <Photo
-          source={{ uri: posts[currentPost].imageUri }}
-          resizeMode="cover"
-        />
+        <Pressable
+          style={{
+            flex: 1,
+          }}
+          onPress={() =>
+            navigation.navigate("ModalScreen", {
+              imageUri: posts[currentPost].imageUri,
+            })
+          }
+        >
+          <Photo
+            source={{ uri: posts[currentPost].imageUri }}
+            resizeMode="cover"
+          />
+        </Pressable>
         <ChatScroll
           ref={chatScroll}
           onContentSizeChange={() => {

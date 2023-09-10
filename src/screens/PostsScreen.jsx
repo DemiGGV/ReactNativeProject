@@ -54,11 +54,22 @@ export const PostsScreen = () => {
             return (
               <Pressable style={{ flex: 1 }} onPress={() => {}}>
                 <PostView>
-                  <PostImage
-                    loadingIndicatorSource={<Loader />}
-                    source={{ uri: item.imageUri }}
-                    resizeMode="cover"
-                  />
+                  <Pressable
+                    style={{
+                      flex: 1,
+                    }}
+                    onPress={() =>
+                      navigation.navigate("ModalScreen", {
+                        imageUri: item.imageUri,
+                      })
+                    }
+                  >
+                    <PostImage
+                      loadingIndicatorSource={<Loader />}
+                      source={{ uri: item.imageUri }}
+                      resizeMode="cover"
+                    />
+                  </Pressable>
                   <PostTitle>{item.title}</PostTitle>
                   <PostData>
                     <DataView

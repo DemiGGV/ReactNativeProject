@@ -15,6 +15,7 @@ import { BackBtn } from "./src/components/BackBtn";
 import { persistor, store } from "./src/redux/store";
 import { Loader } from "./src/components/Loader";
 import { auth } from "./config";
+import { ModalScreen } from "./src/screens/ModalScreen";
 
 const Nav = createStackNavigator();
 
@@ -80,6 +81,13 @@ const App = () => {
                   headerStyle: {
                     borderBottomWidth: 1,
                   },
+                }}
+              />
+              <Nav.Screen
+                name="ModalScreen"
+                component={ModalScreen}
+                options={{
+                  headerShown: false,
                 }}
               />
             </Nav.Navigator>

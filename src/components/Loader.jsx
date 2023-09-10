@@ -12,7 +12,7 @@ const Container = styled.View`
   flex: 1;
   width: 100%;
   height: 100%;
-  background-color: #00000020;
+  background-color: #fff;
   justify-content: center;
   align-items: center;
 `;

@@ -25,7 +25,6 @@ export const CreatePostsScreen = () => {
   const [isCamPermission, setIsCamPermission] = useState(null);
   const [isMediaPermission, setIsMediaPermission] = useState(null);
   const [isLocationPermission, setIsLocationPermission] = useState(null);
-  const [coords, setCoords] = useState({});
   const cameraRef = useRef(null);
   const [typeCamera, setTypeCamera] = useState(Camera.Constants.Type.back);
   const [flashModeSet, setFlashModeSet] = useState(
@@ -53,14 +52,6 @@ export const CreatePostsScreen = () => {
         setIsCamPermission(cameraPermission.status === "granted");
         setIsMediaPermission(mediaPermission.status === "granted");
         setIsLocationPermission(locationPermission.status === "granted");
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted")
-          throw new Error("Permission to access location was denied");
-        const location = await Location.getCurrentPositionAsync({});
-        setCoords({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        });
       } catch (err) {
         let toast = Toast.show(err.message, {
           duration: 1000,
@@ -106,6 +97,10 @@ export const CreatePostsScreen = () => {
     (async () => {
       try {
         setIsDisableButtons(true);
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted")
+          throw new Error("Permission to access location was denied");
+        const location = await Location.getCurrentPositionAsync({});
         const imageURL = await uploadImage(photoUri);
         if (!imageURL) return;
         const post = {
@@ -114,7 +109,10 @@ export const CreatePostsScreen = () => {
           title: values.name,
           location: {
             name: values.geoloc,
-            coordinates: coords,
+            coordinates: {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            },
           },
           comments: [],
           likes: [],

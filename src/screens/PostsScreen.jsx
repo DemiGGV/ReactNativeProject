@@ -26,6 +26,13 @@ export const PostsScreen = () => {
     return () => unsubscribe();
   }, []);
 
+  // useEffect(() => {
+  //   const unsubscribe = onSnapshot(postsCollectionRef, () => {
+  //     dispatch(fetchAllPosts());
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
+
   if (!user) return <Loader />;
 
   return (

@@ -6,7 +6,6 @@ import {
   updateDoc,
   arrayUnion,
   doc,
-  increment,
   deleteDoc,
 } from "firebase/firestore";
 import { db, storage } from "../../../config";
@@ -70,7 +69,6 @@ export const incrementLikes = createAsyncThunk(
     }
   }
 );
-
 export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async (credentials, thunkAPI) => {

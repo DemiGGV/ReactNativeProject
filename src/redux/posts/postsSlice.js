@@ -37,22 +37,22 @@ const handleFetchAll = (state, action) => {
 };
 const handleAddPost = (state, action) => {
   state.isLoading = false;
-  state.posts.push(action.payload);
+  // state.posts.push(action.payload);
 };
 const handleEditPost = (state, action) => {
   state.isLoading = false;
-  const index = state.posts.findIndex((Post) => Post.id === action.payload.id);
-  state.posts[index].comments.push(action.payload.comment);
+  // const index = state.posts.findIndex((Post) => Post.id === action.payload.id);
+  // state.posts[index].comments.push(action.payload.comment);
 };
 const handleIncrementLikesPost = (state, action) => {
   state.isLoading = false;
-  const index = state.posts.findIndex((Post) => Post.id === action.payload.id);
-  state.posts[index].likes.push(action.payload.uid);
+  // const index = state.posts.findIndex((Post) => Post.id === action.payload.id);
+  // state.posts[index].likes.push(action.payload.uid);
 };
 const handleDelete = (state, action) => {
   state.isLoading = false;
-  const index = state.posts.findIndex((Post) => Post.id === action.payload);
-  state.posts.splice(index, 1);
+  // const index = state.posts.findIndex((Post) => Post.id === action.payload);
+  // state.posts.splice(index, 1);
   let toast = Toast.show("Succesfuly deleted!", {
     duration: 1000,
     backgroundColor: "#40a6ce",

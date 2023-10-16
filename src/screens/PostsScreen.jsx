@@ -6,11 +6,12 @@ import { Feather } from "@expo/vector-icons";
 import styled from "styled-components/native";
 
 import { getUser } from "../redux/user/authSelectors";
-import { auth } from "../../config";
+import { auth, db } from "../../config";
 import { getPosts } from "../redux/posts/postsSelectors";
 import { fetchAllPosts, incrementLikes } from "../redux/posts/postsOperations";
 import { setCurrentID } from "../redux/posts/postsSlice";
 import { Loader } from "../components/Loader";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export const PostsScreen = () => {
   const navigation = useNavigation();
@@ -26,12 +27,12 @@ export const PostsScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  // useEffect(() => {
-  //   const unsubscribe = onSnapshot(postsCollectionRef, () => {
-  //     dispatch(fetchAllPosts());
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "posts"), () => {
+      dispatch(fetchAllPosts());
+    });
+    return () => unsubscribe();
+  }, []);
 
   if (!user) return <Loader />;
 

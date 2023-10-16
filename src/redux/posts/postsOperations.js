@@ -31,8 +31,8 @@ export const addPost = createAsyncThunk(
   "posts/addPost",
   async (credentials, thunkAPI) => {
     try {
-      const docRef = await addDoc(collection(db, "posts"), credentials);
-      return { ...credentials, id: docRef.id };
+      await addDoc(collection(db, "posts"), credentials);
+      return;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
     }
@@ -48,7 +48,7 @@ export const editPost = createAsyncThunk(
       await updateDoc(postRef, {
         comments: arrayUnion(comment),
       });
-      return { id, comment };
+      return;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
     }
@@ -63,7 +63,7 @@ export const incrementLikes = createAsyncThunk(
       await updateDoc(postRef, {
         likes: arrayUnion(uid),
       });
-      return { id, uid };
+      return;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
     }
@@ -78,7 +78,7 @@ export const deletePost = createAsyncThunk(
       const desertRef = ref(storage, imageURL);
       await deleteObject(desertRef);
       await deleteDoc(docRef);
-      return id;
+      return;
     } catch (err) {
       return thunkAPI.rejectWithValue(err.message);
     }

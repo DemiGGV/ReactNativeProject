@@ -56,7 +56,6 @@ export const CommentsScreen = () => {
         hideOnPress: true,
         delay: 0,
       });
-      console.log("Can't add comment!");
     }
   };
 

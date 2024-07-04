@@ -98,13 +98,10 @@ export const CreatePostsScreen = () => {
       try {
         setIsDisableButtons(true);
         const { status } = await Location.requestForegroundPermissionsAsync();
-        console.log("LocationPermission");
         if (status !== "granted")
           throw new Error("Permission to access location was denied");
         const location = await Location.getCurrentPositionAsync({});
-        console.log("GetLocation");
         const imageURL = await uploadImage(photoUri);
-        console.log("ImageUploaded");
 
         if (!imageURL) return;
         const post = {
